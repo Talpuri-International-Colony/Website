@@ -37,6 +37,16 @@
 
     <!-- Custom Theme Style -->
     <link href="../../build/css/custom.min.css" rel="stylesheet">
+
+
+
+    <!-- Select2 -->
+    <link href="../../vendors/select2/dist/css/select2.min.css" rel="stylesheet">
+    <!-- Switchery -->
+    <link href="../../vendors/switchery/dist/switchery.min.css" rel="stylesheet">
+
+
+
   </head>
 
   <body class="nav-md">
@@ -82,70 +92,9 @@
             <br />
 
             <!-- sidebar menu -->
-            <div id="sidebar-menu" class="main_menu_side hidden-print main_menu">
-              <div class="menu_section">
-                <h3>General</h3>
-                <ul class="nav side-menu">
-                  <li><a href="home_page.php"><i class="fa fa-home"></i> Home <!-- <span class="fa fa-chevron-down"> --></span></a>
-                  </li>
-                  <li><a><i class="fa fa-edit"></i> Admin Tasks <span class="fa fa-chevron-down"></span></a>
-                    <ul class="nav child_menu">
-                      <li><a href="admin_tasks.php#tabContent1" onclick="activateTab1()"> New Registration Requests</a></li>
-                      <li><a href="admin_tasks.php#tabContent2" onclick="activateTab2()">  Handle Complaints </a></li>
-                      <li><a href="admin_tasks.php#tabContent3" onclick="activateTab3()">Notice Board Pins</a></li>
-                    </ul>
-                  </li>
-                  <li><a><i class="fa fa-users"></i> Support Contacts <span class="fa fa-chevron-down"></span></a>
-                    <ul class="nav child_menu">
-                      <li><a href="general_elements.html"> Plumbers </a></li>
-                      <li><a href="media_gallery.html"> Electrician </a></li>
-                      <li><a href="typography.html"> Mason / Handyman </a></li>
-                      <li><a href="icons.html">Painters</a></li>
-                      <li><a href="glyphicons.html">Air-Conditioning</a></li>
-                      <li><a href="widgets.html">Carpenter</a></li>
-                      <li><a href="invoice.html">Kitchen Appliance Repair</a></li>
-                      <li><a href="inbox.html">House Maids</a></li>
-                      <li><a href="calendar.html">Security</a></li>
-                      <li><a href="calendar.html">House Water Supply</a></li>
-                      <li><a href="calendar.html">Electricity Failure</a></li>
-                      <li><a href="calendar.html">Landline issues</a></li>
-                      <li><a href="calendar.html">Catering needs</a></li>
-                      <li><a href="calendar.html">Theft</a></li>
-                      <li><a href="calendar.html">Snakes / Dog nuisance</a></li>
-                      <li><a href="calendar.html">Medical Needs</a></li>
-                      <li><a href="calendar.html">Road Accidents</a></li>
-                      <li><a href="calendar.html">Fire Brigade</a></li>
-                      <li><a href="calendar.html">Street Light</a></li>
-                      <li><a href="calendar.html">Lifts</a></li>
-                      <li><a href="calendar.html">Water Drainage</a></li>
-                      <li><a href="calendar.html">Sewage Treatment & Disposal </a></li>
-                      <li><a href="calendar.html">Open Space / Garden Management</a></li>
-                      <li><a href="calendar.html">Road/Drain Cleaning</a></li>
-                      <li><a href="calendar.html">Garbage Collection</a></li>
-                      <li><a href="calendar.html">General Support</a></li>
-                    </ul>
-                  </li>
-                  <li><a><i class="fa fa-inr"></i> RWA Funds Management <span class="fa fa-chevron-down"></span></a>
-                    <ul class="nav child_menu">
-                      <li><a href="tables.html">Tables</a></li>
-                      <li><a href="tables_dynamic.html">Table Dynamic</a></li>
-                    </ul>
-                  </li>
-                  <li><a><i class="fa fa-bar-chart-o"></i> Colony Statistics <span class="fa fa-chevron-down"></span></a>
-                    <ul class="nav child_menu">
-                      <li><a href="chartjs.html">Chart JS</a></li>
-                      <li><a href="chartjs2.html">Chart JS2</a></li>
-                      <li><a href="morisjs.html">Moris JS</a></li>
-                      <li><a href="echarts.html">ECharts</a></li>
-                      <li><a href="other_charts.html">Other Charts</a></li>
-                    </ul>
-                  </li>
-                
-                </ul>
-              </div>
-            
-
-            </div>
+            <?php
+            echo_Admin_sideBar_Menu();
+            ?>
             <!-- /sidebar menu -->
 
             <!-- /menu footer buttons -->
@@ -538,63 +487,56 @@
                                                           </div>
                                                           <div class="x_content">
                                                             <ul class="list-unstyled timeline">
+
+
+
+                                                            <?php 
+
+
+                                                            $all_unres_complaints = fetchAllUnresolvedComplaints();
+
+
+                                                              $counter = 0;
+                                                              foreach ($all_unres_complaints as $cmplnt) {
+
+                                                                $counter = $counter + 1;
+
+
+                                                            echo"
                                                               <li>
-                                                                <div class="block">
-                                                                  <div class="tags">
-                                                                    <a href="" class="tag">
-                                                                      <span>Entertainment</span>
+                                                                <div class='block'>
+                                                                  <div class='tags'>
+
+                                                                    <a data-toggle='modal' data-target='.bs-example-modal-lg' class='tag'>
+                                                                      <span>Resolve</span>
                                                                     </a>
+
+                                                                    <hr>
+                                                                     <button href='' class='btn btn-danger'>
+                                                                      <span >Delete</span>
+                                                                    </button>
                                                                   </div>
-                                                                  <div class="block_content">
-                                                                    <h2 class="title">
-                                                                                    <a>Who Needs Sundance When You’ve Got&nbsp;Crowdfunding?</a>
+                                                                  <div class='block_content'>
+                                                                    <h2 class='title'>
+                                                                                    <a>".$cmplnt->complaint_subject."</a>
                                                                                 </h2>
-                                                                    <div class="byline">
-                                                                      <span>13 hours ago</span> by <a>Jane Smith</a>
+                                                                    <div class='byline'>
+                                                                      <span>".$cmplnt->time_stamp."</span> by <a>".$cmplnt->complainant."</a>
                                                                     </div>
-                                                                    <p class="excerpt">Film festivals used to be do-or-die moments for movie makers. They were where you met the producers that could fund your project, and if the buyers liked your flick, they’d pay to Fast-forward and… <a>Read&nbsp;More</a>
+                                                                    <p class='excerpt'>
+                                                                      ".$cmplnt->complaint_body."
                                                                     </p>
+                                                                    <strong> STATUS : </strong> <h5> ".$cmplnt->status." </h5>
                                                                   </div>
                                                                 </div>
-                                                              </li>
-                                                              <li>
-                                                                <div class="block">
-                                                                  <div class="tags">
-                                                                    <a href="" class="tag">
-                                                                      <span>Entertainment</span>
-                                                                    </a>
-                                                                  </div>
-                                                                  <div class="block_content">
-                                                                    <h2 class="title">
-                                                                                    <a>Who Needs Sundance When You’ve Got&nbsp;Crowdfunding?</a>
-                                                                                </h2>
-                                                                    <div class="byline">
-                                                                      <span>13 hours ago</span> by <a>Jane Smith</a>
-                                                                    </div>
-                                                                    <p class="excerpt">Film festivals used to be do-or-die moments for movie makers. They were where you met the producers that could fund your project, and if the buyers liked your flick, they’d pay to Fast-forward and… <a>Read&nbsp;More</a>
-                                                                    </p>
-                                                                  </div>
-                                                                </div>
-                                                              </li>
-                                                              <li>
-                                                                <div class="block">
-                                                                  <div class="tags">
-                                                                    <a href="" class="tag">
-                                                                      <span>Entertainment</span>
-                                                                    </a>
-                                                                  </div>
-                                                                  <div class="block_content">
-                                                                    <h2 class="title">
-                                                                                    <a>Who Needs Sundance When You’ve Got&nbsp;Crowdfunding?</a>
-                                                                                </h2>
-                                                                    <div class="byline">
-                                                                      <span>13 hours ago</span> by <a>Jane Smith</a>
-                                                                    </div>
-                                                                    <p class="excerpt">Film festivals used to be do-or-die moments for movie makers. They were where you met the producers that could fund your project, and if the buyers liked your flick, they’d pay to Fast-forward and… <a>Read&nbsp;More</a>
-                                                                    </p>
-                                                                  </div>
-                                                                </div>
-                                                              </li>
+                                                              </li>";
+
+                                                            }
+
+                                                              ?>
+
+
+
                                                             </ul>
 
                                                           </div>
@@ -613,6 +555,97 @@
                                   </div>
                                 </div>
                               </div>
+
+
+
+                          <!-- modals -->
+                          <!-- Large modal -->
+
+                          <div class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-hidden="true">
+                            <div class="modal-dialog modal-lg">
+                              <div class="modal-content">
+
+                                <div class="modal-header">
+                                  <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span>
+                                  </button>
+                                  <h4 class="modal-title" id="myModalLabel"> Resolve this complaint  </h4>
+                                </div>
+                                <div class="modal-body">
+                                  <h4>  Select the Type of Support required for this complaint </h4>
+                                 
+
+                                     <div class="form-group">
+                                      <div class="col-md-9 col-sm-9 col-xs-12">
+
+                                          <select class="select2_group form-control">
+
+                                               <optgroup label="House Generic Support">
+                                                 <option value="something here"><a href='general_elements.html'> Plumbers </a></option>
+                                                  <option value="something here"><a href='media_gallery.html'> Electrician </a></option>
+                                                  <option value="something here"><a href='typography.html'> Mason / Handyman </a></option>
+                                                  <option value="something here"><a href='icons.html'>Painters</a></option>
+                                                  <option value="something here"><a href='widgets.html'>Carpenter</a></option>
+                                              </optgroup>
+
+                                              <optgroup label="Electronic Appliances Support">
+                                                  <option value="something here"><a href='glyphicons.html'>Air-Conditioning</a></option>
+                                                  <option value="something here"><a href='invoice.html'>Kitchen Appliances Repair</a></option>
+                                              </optgroup>
+
+
+                                               <optgroup label="Water Related Support">
+                                                  <option value="something here"><a href='calendar.html'>House Water Supply</a></option>
+                                                  <option value="something here"><a href='calendar.html'>Water Drainage</a></option>
+                                                  <option value="something here"><a href='calendar.html'>Sewage Treatment & Disposal </a></option>
+                                              </optgroup>
+
+
+
+                                              <optgroup label="Other General Support">
+                                                
+                                                <option value="something here"><a href='inbox.html'>House Maids</a></option>
+                                                <option value="something here"><a href='calendar.html'>Security</a></option>
+                                                
+                                                <option value="something here"><a href='calendar.html'>Electricity Failure</a></option>
+                                                <option value="something here"><a href='calendar.html'>Landoptionne issues</a></option>
+                                                <option value="something here"><a href='calendar.html'>Catering needs</a></option>
+                                                <option value="something here"><a href='calendar.html'>Theft</a></option>
+                                                <option value="something here"><a href='calendar.html'>Snakes / Dog nuisance</a></option>
+                                                <option value="something here"><a href='calendar.html'>Medical Needs</a></option>
+                                                <option value="something here"><a href='calendar.html'>Road Accidents</a></option>
+                                                <option value="something here"><a href='calendar.html'>Fire Brigade</a></option>
+                                                <option value="something here"><a href='calendar.html'>Street optionght</a></option>
+                                                <option value="something here"><a href='calendar.html'>optionfts</a></option>
+                                                
+                                                
+                                                <option value="something here"><a href='calendar.html'>Open Space / Garden Management</a></option>
+                                                <option value="something here"><a href='calendar.html'>Road/Drain Cleaning</a></option>
+                                                <option value="something here"><a href='calendar.html'>Garbage Collection</a></option>
+                                                <option value="something here"><a href='calendar.html'>General Support</a></li> </option>
+
+                                              </optgroup>
+                                          </select>
+
+                                      </div>
+                                    </div>
+
+
+                                <hr>
+
+
+                                </div>
+
+                                <div class="modal-footer">
+                                  <button type="button" class="btn btn-success" onclick="ajaxResolveComplaint()"> Set this complaint to RESOLVING stage </button>
+                                  
+                                  <button id='btn_close_cmpnt_title_modal' type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                </div>
+
+                              </div>
+                            </div>
+                          </div>
+
+
 
                               <script type="text/javascript">
 
@@ -721,6 +754,11 @@
     <script src="../../build/js/bootstrap-waitingfor.js"></script>
     <script src="../../build/js/bootstrap-waitingfor.min.js"></script>
 
+
+        <!-- Switchery -->
+    <script src="../../vendors/switchery/dist/switchery.min.js"></script>
+    <!-- Select2 -->
+    <script src="../../vendors/select2/dist/js/select2.full.min.js"></script>
 
 
 

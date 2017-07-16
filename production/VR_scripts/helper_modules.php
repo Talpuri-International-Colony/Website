@@ -59,6 +59,12 @@ if($_POST['action'])
 	}
 
 
+	if($_POST['action'] == 'add_new_Complaint')
+	{
+		insertNewComplaint($_POST['complainant'], $_POST['complaintSubject'], $_POST['complaintBody']);
+	}
+
+
 	
 }
 
@@ -69,13 +75,82 @@ if($_POST['action'])
 
 //////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////		UI - REPEATED CODE	//////////////////////////////////////////
-//////////////////////		UI - REPEATED CODE	//////////////////////////////////////////
-//////////////////////		UI - REPEATED CODE	//////////////////////////////////////////
-//////////////////////		UI - REPEATED CODE	//////////////////////////////////////////
+//////////////////////		UI - RE-USABLE CODE	//////////////////////////////////////////
+//////////////////////		UI - RE-USABLE CODE	//////////////////////////////////////////
+//////////////////////		UI - RE-USABLE CODE	//////////////////////////////////////////
+//////////////////////		UI - RE-USABLE CODE	//////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////
 
 
+function echo_Admin_sideBar_Menu()
+{
+	echo 
+
+
+	"
+	<div id='sidebar-menu' class='main_menu_side hidden-print main_menu'>
+              <div class='menu_section'>
+                <h3>General</h3>
+                <ul class='nav side-menu'>
+                  <li><a href='home_page.php'><i class='fa fa-home'></i> Home <!-- <span class='fa fa-chevron-down'> --></span></a>
+                  </li>
+                  <li><a><i class='fa fa-edit'></i> Admin Tasks <span class='fa fa-chevron-down'></span></a>
+                    <ul class='nav child_menu'>
+                      <li><a href='admin_tasks.php#tabContent1' onclick='activateTab1()'> New Registration Requests</a></li>
+                      <li><a href='admin_tasks.php#tabContent2' onclick='activateTab2()'>  Handle Complaints </a></li>
+                      <li><a href='admin_tasks.php#tabContent3' onclick='activateTab3()'>Notice Board Pins</a></li>
+                    </ul>
+                  </li>
+                  <li><a><i class='fa fa-users'></i> Support Contacts <span class='fa fa-chevron-down'></span></a>
+                    <ul class='nav child_menu'>
+                      <li><a href='general_elements.html'> Plumbers </a></li>
+                      <li><a href='media_gallery.html'> Electrician </a></li>
+                      <li><a href='typography.html'> Mason / Handyman </a></li>
+                      <li><a href='icons.html'>Painters</a></li>
+                      <li><a href='glyphicons.html'>Air-Conditioning</a></li>
+                      <li><a href='widgets.html'>Carpenter</a></li>
+                      <li><a href='invoice.html'>Kitchen Appliance Repair</a></li>
+                      <li><a href='inbox.html'>House Maids</a></li>
+                      <li><a href='calendar.html'>Security</a></li>
+                      <li><a href='calendar.html'>House Water Supply</a></li>
+                      <li><a href='calendar.html'>Electricity Failure</a></li>
+                      <li><a href='calendar.html'>Landline issues</a></li>
+                      <li><a href='calendar.html'>Catering needs</a></li>
+                      <li><a href='calendar.html'>Theft</a></li>
+                      <li><a href='calendar.html'>Snakes / Dog nuisance</a></li>
+                      <li><a href='calendar.html'>Medical Needs</a></li>
+                      <li><a href='calendar.html'>Road Accidents</a></li>
+                      <li><a href='calendar.html'>Fire Brigade</a></li>
+                      <li><a href='calendar.html'>Street Light</a></li>
+                      <li><a href='calendar.html'>Lifts</a></li>
+                      <li><a href='calendar.html'>Water Drainage</a></li>
+                      <li><a href='calendar.html'>Sewage Treatment & Disposal </a></li>
+                      <li><a href='calendar.html'>Open Space / Garden Management</a></li>
+                      <li><a href='calendar.html'>Road/Drain Cleaning</a></li>
+                      <li><a href='calendar.html'>Garbage Collection</a></li>
+                      <li><a href='calendar.html'>General Support</a></li>
+                    </ul>
+                  </li>
+                  <li><a><i class='fa fa-inr'></i> RWA Funds Management <span class='fa fa-chevron-down'></span></a>
+                    <ul class='nav child_menu'>
+                      <li><a href='tables.html'>Tables</a></li>
+                      <li><a href='tables_dynamic.html'>Table Dynamic</a></li>
+                    </ul>
+                  </li>
+                  <li><a><i class='fa fa-bar-chart-o'></i> Colony Statistics <span class='fa fa-chevron-down'></span></a>
+                    <ul class='nav child_menu'>
+                      <li><a href='list_all_society_members.php'> Show Registered Members </a></li>
+                    </ul>
+                  </li>
+                
+                </ul>
+              </div>
+            
+
+            </div>
+
+	";
+}
 
 
 
@@ -182,6 +257,22 @@ class Member
 
 
 
+class Complaint
+{
+   function Complaint($complainant_id, $complaint_body, $complaint_subject, $resolved, $status, $time_stamp)
+   {
+      $this->complainant = $complainant_id;
+      $this->time_stamp = $time_stamp;
+      $this->complaint_body = $complaint_body;
+      $this->complaint_subject = $complaint_subject;
+      $this->resolved = $resolved;
+      $this->status = $status;
+   }
+}
+
+
+
+
 
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -259,13 +350,13 @@ function createMembersTable()
 
 function createComplaintsTable()
 {
-     $conn=connectToDatabase();
+    $conn=connectToDatabase();
 
    $sql='CREATE TABLE complaints('.
       'complaint_id INTEGER AUTO_INCREMENT NOT NULL,'.
       'complainant_id varchar(15) NOT NULL,'.
       'time_stamp DATETIME NOT NULL,'.
-      'subject varchar(100) NOT NULL,'.
+      'subject varchar(100) NOT NULL,'. // the status changes as follows :  INITIATED >> RESOLVING >> FINISHED
       'body varchar(1000) NULL,'.
       'status varchar(20) NOT NULL,'.
       'resolved BOOLEAN NOT NULL,'.
@@ -283,6 +374,83 @@ function createComplaintsTable()
    }
    endDatabaseConnection($conn);
 }
+
+function insertNewComplaint($complainant, $complaint_subject, $complaint_body)
+{
+	$conn = connectToDatabase();
+
+
+	$sql="INSERT INTO complaints(complainant_id, time_stamp, subject, body, status, resolved) VALUES ('".$complainant."', now() , '".$complaint_subject."', '".$complaint_body."', 'initiated', 0)";
+
+
+   $retval=mysql_query($sql,$conn);
+   
+   if(!$retval )
+   {
+     die('Could not insert data (insertNewComplaint) : ' . mysql_error());
+   }
+   else
+   	echo "success";
+
+   endDatabaseConnection($conn);
+}
+
+
+function getAllComplaintsByUser($complainant_id)
+{
+	$conn=connectToDatabase();
+
+    $sql = "SELECT time_stamp, subject, body, status, resolved FROM complaints WHERE complainant_id = '".$complainant_id."'";
+
+   $retval=mysql_query($sql,$conn);
+   if(! $retval )
+   {
+     die('Could not get data: getAllComplaintsByUser' . mysql_error());
+   }
+
+	$cmplnts_ARRAY = array();
+
+   $i=0;
+   while($row=mysql_fetch_assoc($retval))
+   {
+      $cmplnts_ARRAY[$i] = new Complaint($complainant_id, $row['body'], $row['subject'], $row['resolved'], $row['status'], $row['time_stamp']);
+      $i = $i + 1;
+   }
+
+   endDatabaseConnection($conn);
+   return array_reverse($cmplnts_ARRAY);
+
+}
+
+
+function fetchAllUnresolvedComplaints()
+{
+
+	 $conn=connectToDatabase();
+
+    $sql = "SELECT complainant_id, time_stamp, subject, body, status FROM complaints where resolved = 0";
+
+   $retval=mysql_query($sql,$conn);
+   if(! $retval )
+   {
+     die('Could not get data: fetchAllUnresolvedComplaints' . mysql_error());
+   }
+
+   $complnts_ARRAY = array();
+
+   $i=0;
+   while($row=mysql_fetch_assoc($retval))
+   {
+   	// ($house_id, $email, $mobile, $handovr_date , $occupancy_date, $admin_rights, $approved)
+      $complnts_ARRAY[$i] = new Complaint($row['complainant_id'], $row['body'], $row['subject'], $row['resolved'], $row['status'], $row['time_stamp']);
+      $i = $i + 1;
+   }
+
+   endDatabaseConnection($conn);
+   return array_reverse($complnts_ARRAY);
+
+}
+
 
 
 function insertNewUnapprovedMemberRecord($usr_login_id, $usr_email, $usr_mobile, $usr_pwd, $usr_house_owner_name, $usr_hndovr_date, $usr_occpnc_date)
@@ -470,6 +638,7 @@ function tryLogin($username, $password)
    	  	{	
    	  		session_start();
    	  		$_SESSION['_house_owner_name_']=$row['owner_name'];
+   	  		$_SESSION['house_id']=$username;
 
    	  		if($row['admin_rights']==true)
    	  			echo 'login_as_admin';

@@ -61,6 +61,8 @@
     window.onload = function() {
         PNotify.removeAll();
     };
+
+
   </script>
 
 
@@ -82,6 +84,7 @@
               <div class="profile_info">
                 <span>Welcome,</span>
                 <h2> <?php echo $_SESSION['_house_owner_name_']; ?> </h2>
+                <input id="house_id_logged_in" type="text" hidden value= <?php echo "'".$_SESSION['house_id']."'"; ?> ></input>
               </div>
             </div>
             <!-- /menu profile quick info -->
@@ -275,69 +278,87 @@
 
                                            <!-- start accordion -->
                                             <div class="accordion" id="accordion" role="tablist" aria-multiselectable="true">
-                                              <div class="panel">
-                                                <a class="panel-heading" role="tab" id="headingOne" data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-                                                  <h4 class="panel-title">Complaint #1</h4>
-                                                </a>
-                                                <div id="collapseOne" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
-                                                  <div class="panel-body">
-                                                    <table class="table table-bordered">
-                                                      <thead>
-                                                        <tr>
-                                                          <th>#</th>
-                                                          <th>First Name</th>
-                                                          <th>Last Name</th>
-                                                          <th>Username</th>
-                                                        </tr>
-                                                      </thead>
-                                                      <tbody>
-                                                        <tr>
-                                                          <th scope="row">1</th>
-                                                          <td>Mark</td>
-                                                          <td>Otto</td>
-                                                          <td>@mdo</td>
-                                                        </tr>
-                                                        <tr>
-                                                          <th scope="row">2</th>
-                                                          <td>Jacob</td>
-                                                          <td>Thornton</td>
-                                                          <td>@fat</td>
-                                                        </tr>
-                                                        <tr>
-                                                          <th scope="row">3</th>
-                                                          <td>Larry</td>
-                                                          <td>the Bird</td>
-                                                          <td>@twitter</td>
-                                                        </tr>
-                                                      </tbody>
-                                                    </table>
+
+
+                                            <?php
+
+
+                                              $all_my_complaints = getAllComplaintsByUser($_SESSION['house_id']);
+
+
+                                              $counter = 0;
+                                              foreach ($all_my_complaints as $cmplnt) {
+                                                $counter = $counter + 1;
+
+                                                    if($cmplnt->resolved)
+                                                      $resolv_mssg = "<h2 class='pull-right' style='color : green;'> RESOLVED";
+                                                    else
+                                                      $resolv_mssg = "<h2 class='pull-right' style='color : red;'> UNRESOLVED";
+                                                
+
+                                              echo "  
+                                                <div class='panel'>
+                                                  <a class='panel-heading' role='tab' id='headingOne' data-toggle='collapse' data-parent='#accordion' href='#cmpnt_tab_collapse_".$counter."' aria-expanded='true' aria-controls='cmpnt_tab_collapse_".$counter."'>
+                                                    <h4 class='panel-title'>".$cmplnt->complaint_subject."</h4> &nbsp; ".$resolv_mssg."</h2>
+                                                  </a>
+                                                  <div id='cmpnt_tab_collapse_".$counter."' class='panel-collapse collapse' role='tabpanel' aria-labelledby='headingOne'>
+                                                    <div class='panel-body'>
+                                                      
+                                                      <hr>
+
+                                                      <p><strong>SUBJECT</strong>
+                                                      </p>
+                                                      ".$cmplnt->complaint_subject."
+
+                                                      <hr>
+
+                                                      <p><strong>COMPLAINT BODY</strong>
+                                                      </p>
+                                                      ".$cmplnt->complaint_body."
+
+                                                      <hr>
+
+                                                      <p><strong>CURRENT STATUS</strong>
+                                                      </p>
+                                                      ".$cmplnt->status."
+
+                                                      <hr>
+
+                                                      <p><strong>DATE & TIME OF COMPLAINT</strong>
+                                                      </p>
+                                                      ".$cmplnt->time_stamp."
+
+                                                      <hr>
+
+
+                                                            <div class='x_content' style='text-align: center;'>
+
+                                                                  <button type='button' onclick=\"ajax_reg_request_approve('".$memb->house_id."', 'false')\" class='btn btn-round btn-success'> Thanks Admin ! You resolved my issue. </button>
+
+                                                                  <button type='button' onclick=\"ajax_reg_request_sndmssg('".$memb->house_id."', 'Plz meet Mr. Shishir Tamotia personally for approval of your Talpuri RWA registration request.')\" class='btn btn-round btn-primary'>Request Admin to Call me</button>
+
+                                                                  <button type='button' onclick=\"ajax_reg_request_approve('".$memb->house_id."', 'true')\" class='btn btn-round btn-info'> ITS URGENT. I need HELP </button>
+
+                                                                  <button type='button' onclick=\"ajax_reg_request_reject('".$memb->house_id."', 'Plz resubmit your Talpuri RWA registration request with complete & correct details. Contact Mr. Shishir Tamotia for details.')\"  class='btn btn-round btn-warning'> I resolved this issue on my own</button>
+
+                                                                  <button type='button' onclick=\"ajax_reg_request_reject('".$memb->house_id."', '')\" class='btn btn-round btn-danger'> Delete This Complaint</button>
+                                                                </div>
+
+
+
+
+
+                                                    </div>
                                                   </div>
                                                 </div>
-                                              </div>
-                                              <div class="panel">
-                                                <a class="panel-heading collapsed" role="tab" id="headingTwo" data-toggle="collapse" data-parent="#accordion" href="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
-                                                  <h4 class="panel-title">Collapsible Group Items #2</h4>
-                                                </a>
-                                                <div id="collapseTwo" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingTwo">
-                                                  <div class="panel-body">
-                                                    <p><strong>Collapsible Item 2 data</strong>
-                                                    </p>
-                                                    Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3 wolf moon tempor,
-                                                  </div>
-                                                </div>
-                                              </div>
-                                              <div class="panel">
-                                                <a class="panel-heading collapsed" role="tab" id="headingThree" data-toggle="collapse" data-parent="#accordion" href="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
-                                                  <h4 class="panel-title">Collapsible Group Items #3</h4>
-                                                </a>
-                                                <div id="collapseThree" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingThree">
-                                                  <div class="panel-body">
-                                                    <p><strong>Collapsible Item 3 data</strong>
-                                                    </p>
-                                                    Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3 wolf moon tempor
-                                                  </div>
-                                                </div>
-                                              </div>
+                                                ";
+
+                                              }
+
+                                              ?>
+
+
+
                                             </div>
                                             <!-- end of accordion -->
 
@@ -470,8 +491,23 @@
         <div id="editor" class="editor-wrapper"></div>
       </div>
 
+
+
       <div class="compose-footer">
-        <button id="send" class="btn btn-lg btn-success compose-close" type="button" data-toggle="modal" data-target=".bs-example-modal-lg" >Lodge Complaint</button>
+        <button id="send_complnt_bttn" class="btn btn-lg btn-success compose-close" type="button" data-toggle="modal" data-target=".bs-example-modal-lg"  >Lodge Complaint</button>
+
+      
+
+       <script type="text/javascript">
+      // document.getElementById ("send_complnt_bttn").addEventListener ("click", send_Complaint, false);
+
+         /* send_Complaint = function() {
+            window.alert($('#editor').text());
+          }*/
+      </script>
+
+
+
 
         <button type="button" class="pull-left compose-close btn btn-danger btn-lg">
           Cancel
@@ -499,11 +535,11 @@
                         </div>
                         <div class="modal-body">
                           <h4>  What are you complaining about ? </h4>
-                          <input type="text" class="form-control" placeholder="Enter Complaint Subject here ... " required>
+                          <input id="complnt_subject_input" type="text" class="form-control" placeholder="Enter Complaint Subject here ... " required>
                         </div>
                         <div class="modal-footer">
-                          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                          <button type="button" class="btn btn-primary"> Submit Complaint to Administrator</button>
+                          <button id='btn_close_cmpnt_title_modal' type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                          <button type="button" class="btn btn-primary" onclick="ajaxSendComplaint()"> Submit Complaint to Administrator</button>
                         </div>
 
                       </div>
@@ -511,6 +547,86 @@
                   </div>
 
 
+
+
+                        <script type="text/javascript">
+                          
+
+                              function ajaxSendComplaint() {
+
+                                    //window.alert("ok");
+
+                                    var complaint_body =  $('#editor').text();
+                                    var complaint_subj = $('#complnt_subject_input').val();
+                                    var logged_in_house_id = $('#house_id_logged_in').val();
+
+                                   // alert(logged_in_house_id);
+
+                                    if (complaint_body == '')
+                                    {
+                                      new PNotify({
+                                              title: 'Empty complaint body Specified !',
+                                              text: 'You cannot leave the body of the complaint BLANK !',
+                                              type: 'error',
+                                              styling: 'bootstrap3'
+                                            });
+
+                                    }
+                                    else if (complaint_subj == '')
+                                    {
+                                      new PNotify({
+                                              title: 'Empty complaint Subject Specified !',
+                                              text: 'You cannot leave the subject title of the complaint BLANK !',
+                                              type: 'error',
+                                              styling: 'bootstrap3'
+                                            });
+
+                                    }
+                                    else
+                                    {
+
+                                       $.ajax({
+                                         type: "POST",
+                                         url: '../VR_scripts/helper_modules.php',
+                                         data:{action:'add_new_Complaint', complainant: logged_in_house_id, complaintSubject : complaint_subj, complaintBody : complaint_body},
+                                         success:function(html) {
+                                         // alert(html);
+
+                                           new PNotify({
+                                                      title: 'Complaint Succesfully Lodged !',
+                                                      text: 'Your Complaint has been succesfully lodged onto the Database.',
+                                                      type: 'success',
+                                                      styling: 'bootstrap3'
+                                                    });
+
+                                           $('#btn_close_cmpnt_title_modal').click();
+
+
+                                           window.setTimeout(function(){location.reload()},3000);
+
+
+                                           },
+                                           error:function(XMLHttpRequest, textStatus, errorThrown) {
+                                              new PNotify({
+                                                      title: ' FAILURE !',
+                                                      text: 'We faced an error lodging your complaint onto the Database.',
+                                                      type: 'error',
+                                                      styling: 'bootstrap3'
+                                                    });
+                                           }
+
+                                      });
+
+
+                                      waitingDialog.show('Lodging your complaint ... ');
+                                      setTimeout(function () {
+                                        waitingDialog.hide();
+                                      }, 2000);
+                                  }
+                         }
+
+
+                        </script>
 
 
 
@@ -529,7 +645,7 @@
     <script src="../../vendors/iCheck/icheck.min.js"></script>
 
 
-        <!-- PNotify -->
+    <!-- PNotify -->
     <script src="../../vendors/pnotify/dist/pnotify.js"></script>
     <script src="../../vendors/pnotify/dist/pnotify.buttons.js"></script>
     <script src="../../vendors/pnotify/dist/pnotify.nonblock.js"></script>
