@@ -249,7 +249,7 @@
 									 <div>
 											<h1><i class="fa fa-home"></i> Talpuri International Colony RWA </h1>
 											<p> Gmail Address : talpuri.international.colony@gmail.com </p>
-											<p>©2017 All Rights Reserved. Talpuri Society Association, Website Developer - Varun Rawal</p>
+											<p>©2017 All Rights Reserved. Talpuri Society Association, Website Developers - Varun Rawal, Ashish Ekka, Priya Sharma, </p>
 										</div>
 									</div>
 								</form>
@@ -1287,7 +1287,7 @@
 										<div>
 											<h3><i class="fa fa-home"></i> Talpuri International Colony RWA</h3>
 											<p> Gmail Address : talpuri.international.colony@gmail.com </p>
-											<p>©2017 All Rights Reserved. Talpuri Society Association, Website Developer - Varun Rawal</p>
+											<p>©2017 All Rights Reserved. Talpuri Society Association, Website Developers - Varun Rawal, Ashish Ekka, Priya Sharma, </p>
 										</div>
 									</div>
 
