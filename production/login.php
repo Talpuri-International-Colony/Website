@@ -8,6 +8,10 @@
 <html lang="en">
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+		<meta name="csrf-token" content="{{ csrf_token() }}">
+
+
 		<!-- Meta, title, CSS, favicons, etc. -->
 		<meta charset="utf-8">
 		<meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -134,14 +138,28 @@
 												var entered_usrnm = $('#login_usrname').val();
 												var entered_pwd = $('#login_pwd').val();
 
+												$.ajaxSetup({
+													  headers: {
+													    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+													  }
+													});
+
+												slash_last_indx = window.location.href.lastIndexOf('/')
+
+												//window.alert(window.location.href.substring(0,slash_last_indx) + '/VR_scripts/helper_modules.php');
 
 												 $.ajax({
 												           type: "POST",
-												           url: 'VR_scripts/helper_modules.php',
+												           //CSRF: getCSRFTokenValue(),
+												           //url:  'VR_scripts/helper_modules.php',
+												           url : window.location.href.substring(0,slash_last_indx) + '/VR_scripts/helper_modules.php',
 												           data: {action:'try_login', _usr_usrname_ : entered_usrnm, _usr_pwd_ : entered_pwd},
 												           success:function(return_data) {
 
-												           //	window.alert(return_data);
+												          /* window.alert(return_data.trim()==='id_not_found');
+												           window.alert(return_data.trim());*/
+
+												           return_data=return_data.trim();
 
 												           	if(return_data==='id_not_found')
 												           	{
@@ -196,7 +214,7 @@
 												           	{
 
 													             new PNotify({
-								                                  title: 'There\'s something wrong with the Website !',
+								                                  title: 'There\'s something wrong with the Website, returning :- '+return_data+' !',
 								                                  text: 'Please contact the website developer for more details. Error Code : ER4b33',
 								                                  type: 'success',
 								                                  styling: 'bootstrap3'
@@ -805,7 +823,7 @@
 												           data:{action:'call_phone_verifier', receiver: receiver_phone, verif_code: phone_verification_code_js},
 												           success:function(html) {
 												             new PNotify({
-							                                  title: 'phone Succesfully Sent !',
+							                                  title: 'SMS Succesfully Sent !',
 							                                  text: 'The verificaiton code has been succesfully sent to your mobile number '+receiver_phone+' !',
 							                                  type: 'success',
 							                                  styling: 'bootstrap3'

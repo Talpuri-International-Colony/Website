@@ -3,8 +3,8 @@
 include('helper_modules.php');
 
 
-dropMembersTable();
-
+dropTable('complaints');
+dropTable('members');
 
 
 ?>

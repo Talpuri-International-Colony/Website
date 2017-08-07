@@ -1,10 +1,10 @@
 <?php
 
-/*
-  error_reporting(E_ALL);
-ini_set('display_errors', 1);
-*/
-	ini_set('display_errors', 0);
+
+  /*error_reporting(E_ALL);
+ini_set('display_errors', 1);*/
+
+	ini_set('display_errors', 1);
 
 if($_POST['action'])
 {
@@ -305,7 +305,7 @@ function connectToDatabase()
 		// }	
   // 	}
    
-   mysql_select_db('talpuri', $conn);
+   mysql_select_db($db_database, $conn);
    // echo 'Connected successfully <br>';
 
    return $conn;
@@ -518,7 +518,7 @@ function getMemberWithHouseID($house_id)
 }
 
 
-function approveRequestWithHouseID($house_id_2_apprv, $snd_mssg_bool)
+function approveRequestWithHouseID($house_id_2_apprv, $snd_mssg_bool=false)
 {
 	$conn = connectToDatabase();
 
@@ -691,17 +691,17 @@ function fetchAllMembersfromDatabase()
    return array_reverse($members_ARRAY);
 }
 
-function dropMembersTable()
+function dropTable($table_name)
 {
 	 $conn=connectToDatabase();
 
-   $sql='DROP TABLE members';
+   $sql='DROP TABLE '.$table_name.'';
 
    $retval=mysql_query($sql,$conn);
    
    if(!$retval )
    {
-     die('Could not get data (createMembersTable) : ' . mysql_error());
+     die('Could not delete data (drop'.$table_name.'Table) : ' . mysql_error());
    }
    // else{
    //    echo "Created Members Table successfully <br>";
@@ -709,6 +709,9 @@ function dropMembersTable()
 
    endDatabaseConnection($conn);
 }
+
+
+
 
 
 function sendEmailAndPhoneMessageToApplicant($member, $message)
@@ -725,13 +728,23 @@ function sendEmailAndPhoneMessageToApplicant($member, $message)
 
 	// Configuring SMTP server settings
 	$mail = new PHPMailer;
-	$mail->isSMTP();
-	$mail->Host = 'smtp.gmail.com';
-	$mail->Port = 587;
-	$mail->SMTPSecure = 'tls';
-	$mail->SMTPAuth = true;
-	$mail->Username = $email;
-	$mail->Password = $password;
+
+
+
+  include('info.php'); // to include the Configuration Settings for PHPMailer
+
+  $mail->isSMTP();
+
+  $mail->Host = $_MAILER_Host;
+  $mail->Port = $_MAILER_Port;
+  $mail->SMTPSecure = $_MAILER_SMTPSecure;
+  $mail->SMTPAuth = $_MAILER_SMTPAuth;
+
+  if($_MAILER_Username!=='none')
+   $mail->Username = $email;
+  if($_MAILER_Password!=='none')
+   $mail->Password = $password;
+
 
 	// Email Sending Details
 	$mail->addAddress($to_id);
@@ -758,6 +771,8 @@ function sendEmailAndPhoneMessageToApplicant($member, $message)
 function verifyEmailAddress($receiver_email, $verification_code)
 {
 
+  include('info.php');
+
 	require 'PHPMailer-master\PHPMailer-master\PHPMailerAutoload.php';
 
 	// Fetching data that is entered by the user
@@ -769,13 +784,22 @@ function verifyEmailAddress($receiver_email, $verification_code)
 
 	// Configuring SMTP server settings
 	$mail = new PHPMailer;
+
+
+  include('info.php'); // to include the Configuration Settings for PHPMailer
+
 	$mail->isSMTP();
-	$mail->Host = 'smtp.gmail.com';
-	$mail->Port = 587;
-	$mail->SMTPSecure = 'tls';
-	$mail->SMTPAuth = true;
-	$mail->Username = $email;
-	$mail->Password = $password;
+
+	$mail->Host = $_MAILER_Host;
+	$mail->Port = $_MAILER_Port;
+	$mail->SMTPSecure = $_MAILER_SMTPSecure;
+	$mail->SMTPAuth = $_MAILER_SMTPAuth;
+
+  if($_MAILER_Username!=='none')
+	 $mail->Username = $email;
+  if($_MAILER_Password!=='none')
+	 $mail->Password = $password;
+
 
 	// Email Sending Details
 	$mail->addAddress($to_id);
