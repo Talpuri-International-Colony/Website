@@ -4,7 +4,7 @@
   session_start();
 
     if(!isset($_SESSION['_house_owner_name_']))
-    header("Location: ../dashboard/courses.php");
+  //  header("Location: ../dashboard/courses.php");
 
   
 ?>

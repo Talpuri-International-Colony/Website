@@ -1,0 +1,148 @@
+<form>
+									<h1>Login Form</h1>
+
+
+							                  <div id = "pop_over_green" class="alert alert-success alert-dismissible fade in" role="alert" style="display: none;">
+							                    <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span>
+							                    </button>
+							                    <strong> Great ! </strong> You seem to be a registered member of the Talpuri RWA.
+							                  </div>
+							                  <div id = "pop_over_blue" class="alert alert-info alert-dismissible fade in" role="alert" style="display: none;">
+							                    <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span>
+							                    </button>
+							                    <strong> BUT </strong> your request for registration hasn't been approved yet. Please contact Mr. Shishir Tamotia for more details.
+							                  </div>
+							                  <div id = "pop_over_yellow" class="alert alert-warning alert-dismissible fade in" role="alert" style="display: none;">
+							                    <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span>
+							                    </button>
+							                    <strong> Sorry ! </strong> Couldn't find this House ID in our database.
+							                  </div>
+							                  <div id = "pop_over_red" class="alert alert-danger alert-dismissible fade in" role="alert" style="display: none;">
+							                    <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span>
+							                    </button>
+							                    <strong> Sorry !</strong> The password is incorrect.
+							                  </div>
+
+
+
+								
+									<div>
+										<input type="text" id="login_usrname" class="form-control" placeholder="House ID" required='true' />
+									</div>
+									<div>
+										<input type="password" id="login_pwd" class="form-control" placeholder="Password" required='true' />
+									</div>
+									<div>
+										<a class="btn btn-default" onclick="tryToLogin()">Log in</a>
+										<a class="reset_pass" href="#">Lost your password?</a>
+									</div>
+
+
+									<script type="text/javascript">
+
+											var tryToLogin = function()
+											{
+												var entered_usrnm = $('#login_usrname').val();
+												var entered_pwd = $('#login_pwd').val();
+
+
+												 $.ajax({
+												           type: "POST",
+												           url: 'VR_scripts/helper_modules.php',
+												           data: {action:'try_login', _usr_usrname_ : entered_usrnm, _usr_pwd_ : entered_pwd},
+												           success:function(return_data) {
+
+												           //	window.alert(return_data);
+
+												           	if(return_data==='id_not_found')
+												           	{
+												           		$('#pop_over_yellow').attr('style','');
+												           		$('#pop_over_blue').attr('style','display: none;');
+												           		$('#pop_over_green').attr('style','display: none;');
+												           		$('#pop_over_red').attr('style','display: none;');
+												           	}
+												           	else if(return_data==='unapproved_request')
+												           	{
+												           		$('#pop_over_yellow').attr('style','display: none;');
+												           		$('#pop_over_blue').attr('style','');
+												           		$('#pop_over_green').attr('style','');
+												           		$('#pop_over_red').attr('style','display: none;');
+												           	}
+												           		else if(return_data==='incorrect_password')
+												           	{
+												           		$('#pop_over_yellow').attr('style','display: none;');
+												           		$('#pop_over_blue').attr('style','display: none;');
+												           		$('#pop_over_green').attr('style','display: none;');
+												           		$('#pop_over_red').attr('style','');
+												           	}
+
+												           	else if(return_data=='login_as_admin')
+												           	{
+												           		PNotify.removeAll();
+
+												           		$('#jump2welcomepage_bttn').attr('onclick', "location.href = './Admin_Pages/admin_tasks.php'");
+
+
+												           		$('#modal_shower_bttn').click();
+												           	}
+												           	else if(return_data=='login_as_nonadmin')
+												           	{
+												           		PNotify.removeAll();
+
+												           		var modal_text = 
+												           		"<h4> Welcome to Talpuri Association RWA Website</h4>" +
+									                         "<p> Your Account has been found to be activated by the Administrator</p>" +
+									                          "<p> Please follow the decorum of the Society while operating on this Website </p>";
+
+									                          $('#modal_body_content').html(modal_text);
+
+
+												           		$('#myModalLabel').html('Welcome, Member');
+
+												           		$('#jump2welcomepage_bttn').attr('onclick', "location.href = './Member_Pages/home_page.php'");
+
+												           		$('#modal_shower_bttn').click();
+												           	}
+												           	else
+												           	{
+
+													             new PNotify({
+								                                  title: 'There\'s something wrong with the Website !',
+								                                  text: 'Please contact the website developer for more details. Error Code : ER4b33',
+								                                  type: 'success',
+								                                  styling: 'bootstrap3'
+									                              });
+												           	}
+
+
+												           }
+
+												      });
+
+
+											}
+
+									</script>
+
+																<!-- Large modal -->
+							      
+
+
+
+									<div class="clearfix"></div>
+
+									<div class="separator">
+										<p class="change_link">New to site?
+											<a href="#signup" class="to_register"> Create Account </a>
+										</p>
+
+										<div class="clearfix"></div>
+										<br />
+
+									 <div>
+											<h1><i class="fa fa-home"></i> Talpuri International Colony RWA </h1>
+											<p> Gmail Address : talpuri.international.colony@gmail.com </p>
+											<p>©2017 All Rights Reserved. Talpuri Society Association, Website Developer - Varun Rawal</p>
+										</div>
+									</div>
+								</form>

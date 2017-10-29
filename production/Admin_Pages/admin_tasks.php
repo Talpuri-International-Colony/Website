@@ -465,6 +465,7 @@
 
 
                                                     <div class="col-md-12 col-sm-6 col-xs-12">
+
                                                         <div class="x_panel">
                                                           <div class="x_title">
                                                             <h2> Here is a list of all Unresolved Complaints <small> Respond to them by taking action </small></h2>
@@ -512,9 +513,10 @@
                                                                     </a>
 
                                                                     <hr>
-                                                                     <button href='' class='btn btn-danger'>
-                                                                      <span >Delete</span>
-                                                                    </button>
+                                                                    <form>
+                                                                    <input type='text' id='comp_id' value='".$cmplnt->complaint_id."' hidden>
+                                                                     <a class='btn btn-danger' onclick='delete_complaint(".$cmplnt->complaint_id.")''> Delete </a>
+                                                                    </form>
                                                                   </div>
                                                                   <div class='block_content'>
                                                                     <h2 class='title'>
@@ -547,7 +549,284 @@
                                            
                                         </div>
                                         <div role="tabpanel" class="tab-pane fade" id="tab_content3" aria-labelledby="profile-tab">
-                                          <p> Under construction </p>
+                                          <p class="label label-danger"> Under construction </p>
+              <div class="row">
+                <div class="col-md-6 col-xs-12">
+                <div class="x_panel">
+                  <div class="x_title">
+                    <h2>Add A New Notice</h2>
+                    <!-- Hide the right toolbar-->
+                    <!--
+                    <ul class="nav navbar-right panel_toolbox">
+                      <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                      </li>
+                      <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
+                        <ul class="dropdown-menu" role="menu">
+                          <li><a href="#">Settings 1</a>
+                          </li>
+                          <li><a href="#">Settings 2</a>
+                          </li>
+                        </ul>
+                      </li>
+                      <li><a class="close-link"><i class="fa fa-close"></i></a>
+                      </li>
+                    </ul>
+                  -->
+                    <div class="clearfix"></div>
+                  </div>
+                  <div class="x_content">
+
+                    <!-- start form for validation -->
+                    <form id="add_notice" data-parsley-validate>
+
+                      <label for="noticedate">Notice Date* :</label>
+                      <input type="Date" id="noticedate" class="form-control" name="noticedate" required />
+
+                      <label for="noticetitle">Notice Title * :</label>
+                      <input type="text" id="noticetitle" class="form-control" name="noticetitle" required />
+
+                          <label for="message">Notice Content (20 chars min, 100 max) :</label>
+                          <textarea id="message" required="required" class="form-control" name="message" data-parsley-trigger="keyup" data-parsley-minlength="20" data-parsley-maxlength="100" data-parsley-minlength-message="Come on! You need to enter at least a 20 caracters long comment.."
+                            data-parsley-validation-threshold="10"></textarea>
+
+                          <br/>
+                          <a class="btn btn-primary" onclick="add_notice()">Add Notice</a>
+                          <!-- <span class="btn btn-primary" onclick="add_notice()">Add Notice</span> -->
+
+                    </form>
+                    <!-- end form for validations -->
+
+                  </div>
+                </div>
+                </div>
+
+                <div class="col-md-6 col-xs-12">
+                <div class="x_panel">
+                  <div class="x_title">
+                    <h2>Manage existing notices</h2>
+                    <div class="clearfix"></div>
+                  </div>
+                  <div class="x_content">
+
+                    <div class="table-responsive">
+                      <table class="table table-striped jambo_table bulk_action">
+                        <thead>
+                          <tr class="headings">
+                            <!--
+                            <th>
+                              <input type="checkbox" id="check-all" class="flat">
+                            </th>
+                            -->
+                            <th class="column-title">Id </th>
+                            <th class="column-title">Date </th>
+                            <th class="column-title">Title </th>
+                            <th class="column-title no-link last"><span class="nobr">Action</span>
+                            </th>
+                            <th class="bulk-actions" colspan="7">
+                              <a class="antoo" style="color:#fff; font-weight:500;">Bulk Actions ( <span class="action-cnt"> </span> ) <i class="fa fa-chevron-down"></i></a>
+                            </th>
+                          </tr>
+                        </thead>
+
+                        <tbody>
+                          <?php
+                            $notice_list = fetchAllNotices();
+
+                            $count = 0;
+
+                            foreach ($notice_list as $notice) {
+                              $count = $count + 1;
+
+                              if($count%2) echo "<tr class='odd pointer'>";
+                              else echo "<tr class='even pointer'>";
+
+                              echo "
+                                <td class=''>".$notice->notice_id."</td>
+                                <td class=''>".$notice->notice_date."</td>
+                                <td class=''>".$notice->notice_title."</td>
+                                <td class='' hidden>".$notice->notice_content."</td>
+                                <td class=' last'>
+                                <a href='#' id='btn_edit_notice' class='btn btn-warning edit_buttons'><i class='fa fa-edit'></i></a>
+                                <a href='#' class='btn btn-danger' onclick='delete_notice(".$notice->notice_id.")'><i class='fa fa-remove'></i></a>
+                                </td>
+                              ";
+                              echo "</tr>";
+                            }
+                            
+                          ?>
+
+                          
+                        </tbody>
+                      </table>
+                    </div>
+
+                  </div>
+                </div>
+                </div>
+              </div>
+
+                <script type="text/javascript">
+
+                      var add_notice = function()
+                      {
+                        var entered_date = $('#noticedate').val();
+                        var entered_title = $('#noticetitle').val();
+                        var entered_msg = $('#message').val();
+
+                        $.ajaxSetup({
+                            headers: {
+                              'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                            }
+                          });
+
+                        slash_last_indx = window.location.href.lastIndexOf('/')
+
+                        //window.alert(window.location.href.substring(0,slash_last_indx) + '/VR_scripts/helper_modules.php');
+
+                         $.ajax({
+                                   type: "POST",
+                                   //CSRF: getCSRFTokenValue(),
+                                   //url:  'VR_scripts/helper_modules.php',
+                                   url : window.location.href.substring(0,slash_last_indx) + '/../VR_scripts/helper_modules.php',
+                                   data: {action:'add_notice', _not_date_ : entered_date, _not_title_ : entered_title, _not_msg_ : entered_msg},
+                                   success:function(return_data) {
+                                    new PNotify({
+                                      text: 'Success !',
+                                      text: 'Successfully added new notice!',
+                                      type: 'success',
+                                      styling: 'bootstrap3'
+                                    });
+                                    window.setTimeout(function(){location.reload()},5000);
+                                   }
+
+                              });
+
+
+                      }
+
+                      var ajaxEditNotice = function()
+                      {
+                        $('#edit_close').click();
+                        var id = $('#nid').val();
+                        var new_date = $('#ndate').val();
+                        var new_title = $('#ntitle').val();
+                        var new_msg = $('#ncontent').val();
+
+                        $.ajaxSetup({
+                            headers: {
+                              'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                            }
+                          });
+
+                        slash_last_indx = window.location.href.lastIndexOf('/')
+
+                        //window.alert(window.location.href.substring(0,slash_last_indx) + '/VR_scripts/helper_modules.php');
+
+                         $.ajax({
+                                   type: "POST",
+                                   //CSRF: getCSRFTokenValue(),
+                                   //url:  'VR_scripts/helper_modules.php',
+                                   url : window.location.href.substring(0,slash_last_indx) + '/../VR_scripts/helper_modules.php',
+                                   data: {action:'edit_notice', _n_id_ : id, _n_date_ : new_date, _n_title_ : new_title, _n_msg_ : new_msg},
+                                   success:function(return_data) {
+                                    new PNotify({
+                                      text: 'Success !',
+                                      text: 'Successfully updated notice!',
+                                      type: 'success',
+                                      styling: 'bootstrap3'
+                                    });
+                                    window.setTimeout(function(){location.reload()},5000);
+                                   }
+
+                              });
+
+
+                      }
+
+                      $('.edit_buttons').on('click',function(){
+                        $("#edit_notice").modal("show");
+                        $("#nid").val($(this).closest('tr').children()[0].textContent);
+                        $("#ndate").val($(this).closest('tr').children()[1].textContent);
+                        $("#ntitle").val($(this).closest('tr').children()[2].textContent);
+                        $("#ncontent").val($(this).closest('tr').children()[3].textContent);
+                      });
+
+                      var delete_notice = function(n_id)
+                      {                                      
+                            $.ajaxSetup({
+                            headers: {
+                              'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                            }
+                          });
+
+                        slash_last_indx = window.location.href.lastIndexOf('/')
+
+                        //window.alert(window.location.href.substring(0,slash_last_indx) + '/VR_scripts/helper_modules.php');
+
+                         $.ajax({
+                                   type: "POST",
+                                   //CSRF: getCSRFTokenValue(),
+                                   //url:  'VR_scripts/helper_modules.php',
+                                   url : window.location.href.substring(0,slash_last_indx) + '/../VR_scripts/helper_modules.php',
+                                   data: {action:'delete_notice', not_id : n_id},
+                                   success:function(return_data) {
+                                    new PNotify({
+                                      text: 'Success !',
+                                      text: 'Successfully notice deleted!',
+                                      type: 'success',
+                                      styling: 'bootstrap3'
+                                    });
+                                    window.setTimeout(function(){location.reload()},5000);
+                                   }
+
+                              });
+
+
+                      }
+
+                  </script>
+
+
+                    <script type="text/javascript">
+
+                      var delete_complaint = function(input_comp_id)
+                      {
+                                                  
+                              $.ajaxSetup({
+                            headers: {
+                              'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                            }
+                          });
+
+                        slash_last_indx = window.location.href.lastIndexOf('/')
+
+                        //window.alert(window.location.href.substring(0,slash_last_indx) + '/VR_scripts/helper_modules.php');
+
+                         $.ajax({
+                                   type: "POST",
+                                   //CSRF: getCSRFTokenValue(),
+                                   //url:  'VR_scripts/helper_modules.php',
+                                   url : window.location.href.substring(0,slash_last_indx) + '/../VR_scripts/helper_modules.php',
+                                   data: {action:'delete_complaint', comp_id : input_comp_id},
+                                   success:function(return_data) {
+                                    new PNotify({
+                                      text: 'Success !',
+                                      text: 'Successfully deleted!',
+                                      type: 'success',
+                                      styling: 'bootstrap3'
+                                    });
+                                    window.setTimeout(function(){location.reload()},5000);
+                                   }
+
+                              });
+
+
+                      }
+
+                  </script>
+
+
                                         </div>
                                       </div>
                                     </div>
@@ -559,6 +838,45 @@
 
 
                           <!-- modals -->
+
+                          <div class="modal fade bs-example-modal-sm" id="edit_notice" tabindex="-1" role="dialog" aria-hidden="true">
+                    <div class="modal-dialog modal-sm">
+                      <div class="modal-content">
+
+                        <div class="modal-header">
+                          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span>
+                          </button>
+                          <h4 class="modal-title" id="myModalLabel2">Edit Notice</h4>
+                        </div>
+                        <div class="modal-body">
+                          <p>Enter new date, title and content for the notice. Notice ID is not editable(automatically generated).</p>
+                            <form id="add_notice" data-parsley-validate>
+                              <label for="noticeid">Notice Id* :</label>
+                              <input type="text" id="nid" class="form-control" name="noticeid" required readonly/>
+                              <label for="noticedate">Notice Date* :</label>
+                              <input type="Date" id="ndate" class="form-control" name="noticedate" required />
+                              <label for="noticetitle">Notice Title * :</label>
+                              <input type="text" id="ntitle" class="form-control" name="noticetitle" required />
+                              <label for="message">Notice Content (20 chars min, 100 max) :</label>
+                              <textarea id="ncontent" required="required" class="form-control" name="message" data-parsley-trigger="keyup" data-parsley-minlength="20" data-parsley-maxlength="100" data-parsley-minlength-message="Come on! You need to enter at least a 20 caracters long comment.."
+                            data-parsley-validation-threshold="10"></textarea>
+
+                          <br/>
+                          <!-- <span class="btn btn-primary" onclick="add_notice()">Add Notice</span> -->
+
+                    </form>
+                    <!-- end form for validations -->
+                        </div>
+                        <div class="modal-footer">
+                          <button type="button" class="btn btn-default" id="edit_close" data-dismiss="modal">Close</button>
+                          <button type="button" class="btn btn-primary" onclick="ajaxEditNotice()">Save changes</button>
+                        </div>
+
+                      </div>
+                    </div>
+                  </div>
+
+
                           <!-- Large modal -->
 
                           <div class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-hidden="true">
@@ -621,7 +939,7 @@
                                                 <option value="something here"><a href='calendar.html'>Open Space / Garden Management</a></option>
                                                 <option value="something here"><a href='calendar.html'>Road/Drain Cleaning</a></option>
                                                 <option value="something here"><a href='calendar.html'>Garbage Collection</a></option>
-                                                <option value="something here"><a href='calendar.html'>General Support</a></li> </option>
+                                                <option value="something here"><a href='calendar.html'>General Support</a> </option>
 
                                               </optgroup>
                                           </select>

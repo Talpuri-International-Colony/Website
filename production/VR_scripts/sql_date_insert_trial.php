@@ -3,7 +3,6 @@
   error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-
 	$olddate = '07/09/2013';
 	$newdate = date('Y-m-d', strtotime($olddate));
 	//echo $newdate;
@@ -17,8 +16,8 @@ ini_set('display_errors', 1);
 
 function connectToDatabase()
 {
-
-   include('info.php');
+echo "G";
+   /*include('info.php');
    $conn = mysql_connect($dbhost, $dbuser, $dbpass);
    if(! $conn ) {
      die('Could not connect: ' . mysql_error());
@@ -37,7 +36,8 @@ function connectToDatabase()
    // echo 'Connected successfully <br>';
 
    return $conn;
-}
+*/
+   }
 
 function endDatabaseConnection($conn)
 {

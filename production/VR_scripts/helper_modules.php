@@ -1,12 +1,12 @@
 <?php
 
 
-  /*error_reporting(E_ALL);
+ /* error_reporting(E_ALL);
 ini_set('display_errors', 1);*/
 
 	ini_set('display_errors', 1);
 
-if($_POST['action'])
+if(isset($_POST['action']))
 {
 	if($_POST['action'] == 'call_email_verifier') {
 	  verifyEmailAddress($_POST['receiver'], $_POST['verif_code']);
@@ -24,6 +24,26 @@ if($_POST['action'])
 	if($_POST['action'] == 'try_login') {
 		tryLogin($_POST['_usr_usrname_'], $_POST['_usr_pwd_']);
 	}
+
+  if($_POST['action'] == 'add_notice') {
+    addNotice($_POST['_not_date_'], $_POST['_not_title_'], $_POST['_not_msg_']);
+  }
+
+  if($_POST['action'] == 'edit_notice') {
+    editNotice($_POST['_n_id_'],$_POST['_n_date_'], $_POST['_n_title_'], $_POST['_n_msg_']);
+  }
+
+  if($_POST['action'] == 'load_notice') {
+    loadNotice($_POST['notice_id']);
+  }
+
+  if($_POST['action'] == 'delete_complaint') {
+    deleteComplaint($_POST['comp_id']);
+  }
+
+  if($_POST['action'] == 'delete_notice') {
+    deleteNotice($_POST['not_id']);
+  }
 
 	if($_POST['action'] == 'approve_reg_request') {
 
@@ -259,14 +279,26 @@ class Member
 
 class Complaint
 {
-   function Complaint($complainant_id, $complaint_body, $complaint_subject, $resolved, $status, $time_stamp)
+   function Complaint($complaint_id, $complainant_id, $complaint_body, $complaint_subject, $resolved, $status, $time_stamp)
    {
+      $this->complaint_id = $complaint_id;
       $this->complainant = $complainant_id;
       $this->time_stamp = $time_stamp;
       $this->complaint_body = $complaint_body;
       $this->complaint_subject = $complaint_subject;
       $this->resolved = $resolved;
       $this->status = $status;
+   }
+}
+
+class Notices
+{
+   function Notices($nId, $nDate, $nTitle, $nMessage)
+   {
+      $this->notice_id = $nId;
+      $this->notice_date = $nDate;
+      $this->notice_title = $nTitle;
+      $this->notice_content = $nMessage;
    }
 }
 
@@ -428,7 +460,7 @@ function fetchAllUnresolvedComplaints()
 
 	 $conn=connectToDatabase();
 
-    $sql = "SELECT complainant_id, time_stamp, subject, body, status FROM complaints where resolved = 0";
+    $sql = "SELECT complaint_id, complainant_id, resolved, time_stamp, subject, body, status FROM complaints where resolved = 0";
 
    $retval=mysql_query($sql,$conn);
    if(! $retval )
@@ -442,12 +474,41 @@ function fetchAllUnresolvedComplaints()
    while($row=mysql_fetch_assoc($retval))
    {
    	// ($house_id, $email, $mobile, $handovr_date , $occupancy_date, $admin_rights, $approved)
-      $complnts_ARRAY[$i] = new Complaint($row['complainant_id'], $row['body'], $row['subject'], $row['resolved'], $row['status'], $row['time_stamp']);
+      $complnts_ARRAY[$i] = new Complaint($row['complaint_id'], $row['complainant_id'], $row['body'], $row['subject'], $row['resolved'], $row['status'], $row['time_stamp']);
       $i = $i + 1;
    }
 
    endDatabaseConnection($conn);
    return array_reverse($complnts_ARRAY);
+
+}
+
+function fetchAllNotices()
+{
+
+   $conn=connectToDatabase();
+
+    $sql = "SELECT * from notice";
+
+   $retval=mysql_query($sql,$conn);
+   if(! $retval )
+   {
+     die('Could not get data: fetchNotices' . mysql_error());
+   }
+
+   $notices_ARRAY = array();
+
+   $i=0;
+   while($row=mysql_fetch_assoc($retval))
+   {
+    // ($house_id, $email, $mobile, $handovr_date , $occupancy_date, $admin_rights, $approved)
+      $notices_ARRAY[$i] = new Notices($row['nId'], $row['nDate'], $row['nTitle'], $row['nMessage']);
+      $i = $i + 1;
+   }
+
+   endDatabaseConnection($conn);
+   return $notices_ARRAY;
+   //return array_reverse($notices_ARRAY);
 
 }
 
@@ -600,6 +661,90 @@ function giveAdminRightsToHouseID($house_id_2_adminate)
    sendEmailAndPhoneMessageToApplicant(getMemberWithHouseID($house_id_2_adminate), "Congratz ! You have now been given full Administrator Privileges by the Talpuri Association RWA. You may now log into your Admin account");
 }
 
+function addNotice($date, $title, $msg)
+{
+  $conn = connectToDatabase();
+
+
+  $sql="INSERT INTO notice(nDate, nTitle, nMessage) values('".$date."', '".$title."', '".$msg."')";
+
+
+   $retval=mysql_query($sql,$conn);
+   
+   if(!$retval )
+   {
+     die('Could not insert data (addNotice) : ' . mysql_error());
+   }
+   // else{
+   //    echo "Added Notice successfully <br>";
+   // }
+
+   endDatabaseConnection($conn);
+}
+
+function editNotice($id, $date, $title, $msg)
+{
+  $conn = connectToDatabase();
+
+
+  $sql="UPDATE notice SET nDate = '".$date."', nTitle = '".$title."', nMessage = '".$msg."' WHERE nId = '".$id."'";
+
+
+   $retval=mysql_query($sql,$conn);
+   
+   if(!$retval )
+   {
+     die('Could not update data (editNotice) : ' . mysql_error());
+   }
+   // else{
+   //    echo "Updated Notice successfully <br>";
+   // }
+
+   endDatabaseConnection($conn);
+}
+
+
+function deleteComplaint($comp_id)
+{
+  $conn = connectToDatabase();
+
+
+  $sql="delete from complaints where complaint_id=$comp_id";
+
+
+   $retval=mysql_query($sql,$conn);
+   
+   if(!$retval )
+   {
+     die('Could not delete data (deleteComplaint) : ' . mysql_error());
+   }
+   // else{
+   //    echo "Added Notice successfully <br>";
+   // }
+
+   endDatabaseConnection($conn);
+}
+
+function deleteNotice($n_id)
+{
+  $conn = connectToDatabase();
+
+
+  $sql="delete from notice where nId=$n_id";
+
+
+   $retval=mysql_query($sql,$conn);
+   
+   if(!$retval )
+   {
+     die('Could not delete data (deleteNotice) : ' . mysql_error());
+   }
+   // else{
+   //    echo "Added Notice successfully <br>";
+   // }
+
+   endDatabaseConnection($conn);
+}
 
 function tryLogin($username, $password)
 {
