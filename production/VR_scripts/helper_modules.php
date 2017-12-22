@@ -29,6 +29,14 @@ if(isset($_POST['action']))
     addNotice($_POST['_not_date_'], $_POST['_not_title_'], $_POST['_not_msg_']);
   }
 
+  if($_POST['action'] == 'resolve_complaint') {
+    resolveComplaint($_POST['comp_id'], $_POST['worker_id'], $_POST['comp_date'], $_POST['comp_time']);
+  }
+
+  if($_POST['action'] == 'view_complaint') {
+    viewComplaint($_POST['comp_id']);
+  }
+
   if($_POST['action'] == 'edit_notice') {
     editNotice($_POST['_n_id_'],$_POST['_n_date_'], $_POST['_n_title_'], $_POST['_n_msg_']);
   }
@@ -39,6 +47,10 @@ if(isset($_POST['action']))
 
   if($_POST['action'] == 'delete_complaint') {
     deleteComplaint($_POST['comp_id']);
+  }
+
+  if($_POST['action'] == 'issue_resolved') {
+    issueResolved($_POST['comp_id']);
   }
 
   if($_POST['action'] == 'delete_notice') {
@@ -279,7 +291,7 @@ class Member
 
 class Complaint
 {
-   function Complaint($complaint_id, $complainant_id, $complaint_body, $complaint_subject, $resolved, $status, $time_stamp)
+   function Complaint($complaint_id, $complainant_id, $complaint_body, $complaint_subject, $resolved, $status, $time_stamp, $worker_assigned, $date, $time)
    {
       $this->complaint_id = $complaint_id;
       $this->complainant = $complainant_id;
@@ -288,6 +300,9 @@ class Complaint
       $this->complaint_subject = $complaint_subject;
       $this->resolved = $resolved;
       $this->status = $status;
+      $this->worker = $worker_assigned;
+      $this->date = $date;
+      $this->time = $time;
    }
 }
 
@@ -299,6 +314,17 @@ class Notices
       $this->notice_date = $nDate;
       $this->notice_title = $nTitle;
       $this->notice_content = $nMessage;
+   }
+}
+
+class Worker
+{
+   function Worker($wid, $wname, $wjob, $wphone)
+   {
+      $this->worker_id = $wid;
+      $this->worker_name = $wname;
+      $this->worker_job = $wjob;
+      $this->worker_phone = $wphone;
    }
 }
 
@@ -432,7 +458,7 @@ function getAllComplaintsByUser($complainant_id)
 {
 	$conn=connectToDatabase();
 
-    $sql = "SELECT time_stamp, subject, body, status, resolved FROM complaints WHERE complainant_id = '".$complainant_id."'";
+    $sql = "SELECT complaint_id, time_stamp, subject, body, status, worker_assigned, date_alloted, time_alloted, resolved FROM complaints WHERE complainant_id = '".$complainant_id."'";
 
    $retval=mysql_query($sql,$conn);
    if(! $retval )
@@ -445,7 +471,7 @@ function getAllComplaintsByUser($complainant_id)
    $i=0;
    while($row=mysql_fetch_assoc($retval))
    {
-      $cmplnts_ARRAY[$i] = new Complaint($complainant_id, $row['body'], $row['subject'], $row['resolved'], $row['status'], $row['time_stamp']);
+      $cmplnts_ARRAY[$i] = new Complaint($row['complaint_id'], $complainant_id, $row['body'], $row['subject'], $row['resolved'], $row['status'], $row['time_stamp'], $row['worker_assigned'], $row['date_alloted'], $row['time_alloted']);
       $i = $i + 1;
    }
 
@@ -460,7 +486,7 @@ function fetchAllUnresolvedComplaints()
 
 	 $conn=connectToDatabase();
 
-    $sql = "SELECT complaint_id, complainant_id, resolved, time_stamp, subject, body, status FROM complaints where resolved = 0";
+    $sql = "SELECT complaint_id, complainant_id, resolved, time_stamp, subject, body, status, worker_assigned FROM complaints where resolved = 0";
 
    $retval=mysql_query($sql,$conn);
    if(! $retval )
@@ -474,7 +500,7 @@ function fetchAllUnresolvedComplaints()
    while($row=mysql_fetch_assoc($retval))
    {
    	// ($house_id, $email, $mobile, $handovr_date , $occupancy_date, $admin_rights, $approved)
-      $complnts_ARRAY[$i] = new Complaint($row['complaint_id'], $row['complainant_id'], $row['body'], $row['subject'], $row['resolved'], $row['status'], $row['time_stamp']);
+      $complnts_ARRAY[$i] = new Complaint($row['complaint_id'], $row['complainant_id'], $row['body'], $row['subject'], $row['resolved'], $row['status'], $row['time_stamp'], $row['worker_assigned'], "", "");
       $i = $i + 1;
    }
 
@@ -512,6 +538,58 @@ function fetchAllNotices()
 
 }
 
+function fetchWorker($wid) {
+  $conn=connectToDatabase();
+
+  $sql = "SELECT * from workers where wid = '".$wid."'";
+
+  $retval = mysql_query($sql, $conn);
+
+  if(! $retval )
+   {
+     die('Could not get data: fetchWorkers' . mysql_error());
+   }
+
+   $workers_ARRAY = array();
+
+   $i=0;
+   while($row=mysql_fetch_assoc($retval))
+   {
+      $workers_ARRAY[$i] = new Worker($row['wid'], $row['wname'], $row['wjob'], $row['wphone']);
+      $i = $i + 1;
+   }
+
+   endDatabaseConnection($conn);
+   return $workers_ARRAY[0];
+}
+
+function fetchAllWorkers()
+{
+
+   $conn=connectToDatabase();
+
+    $sql = "SELECT * from workers";
+
+   $retval=mysql_query($sql,$conn);
+   if(! $retval )
+   {
+     die('Could not get data: fetchWorkers' . mysql_error()); 
+   }
+
+   $workers_ARRAY = array();
+
+   $i=0;
+   while($row=mysql_fetch_assoc($retval))
+   {
+      $workers_ARRAY[$i] = new Worker($row['wid'], $row['wname'], $row['wjob'], $row['wphone']);
+      $i = $i + 1;
+   }
+
+   endDatabaseConnection($conn);
+   return $workers_ARRAY;
+   //return array_reverse($workers_ARRAY);
+
+}
 
 
 function insertNewUnapprovedMemberRecord($usr_login_id, $usr_email, $usr_mobile, $usr_pwd, $usr_house_owner_name, $usr_hndovr_date, $usr_occpnc_date)
@@ -677,6 +755,67 @@ function addNotice($date, $title, $msg)
    }
    // else{
    //    echo "Added Notice successfully <br>";
+   // }
+
+   endDatabaseConnection($conn);
+}
+
+function resolveComplaint($cid, $wid, $date, $time)
+{
+  $conn = connectToDatabase();
+
+
+  $sql="UPDATE complaints SET status = 'in_progress', worker_assigned = '".$wid."', date_alloted = '".$date."', time_alloted = '".$time."' WHERE complaint_id = '".$cid."'";
+
+
+   $retval=mysql_query($sql,$conn);
+   
+   if(!$retval )
+   {
+     die('Could not update data (resolveComplaint) : ' . mysql_error());
+   }
+   else{
+    $worker = fetchWorker($wid);
+    sendEmailAndPhoneMessageToApplicant(getMemberWithHouseID($house_id_2_apprv), "Your complaint with CID: ".$cid." has processed. Worker: ".$worker->worker_name." will asssist you on ".$date." at ".$time);
+   }
+
+   endDatabaseConnection($conn);
+}
+
+function issueResolved($cid)
+{
+  $conn = connectToDatabase();
+
+
+  $sql="UPDATE complaints SET resolved = '1', status = 'resolved' WHERE complaint_id = '".$cid."'";
+
+
+   $retval=mysql_query($sql,$conn);
+   
+   if(!$retval )
+   {
+     die('Could not update data issueResolved) : ' . mysql_error());
+   }
+
+   endDatabaseConnection($conn);
+}
+
+function viewComplaint($cid)
+{
+  $conn = connectToDatabase();
+
+
+  $sql="UPDATE complaints SET status = 'viewed' WHERE complaint_id = '".$cid."'";
+
+
+   $retval=mysql_query($sql,$conn);
+   
+   if(!$retval )
+   {
+     die('Could not update data (viewComplaint) : ' . mysql_error());
+   }
+   // else{
+   //    echo "Complaint Viewed<br>";
    // }
 
    endDatabaseConnection($conn);

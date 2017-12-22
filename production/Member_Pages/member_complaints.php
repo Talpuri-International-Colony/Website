@@ -44,6 +44,53 @@
 
     <!-- Custom Theme Style -->
     <link href="../../build/css/custom.min.css" rel="stylesheet">
+    <style type="text/css">
+    .stepwizard-step p {
+    margin-top: 10px;    
+}
+
+.stepwizard-row {
+    display: table-row;
+}
+
+.stepwizard {
+    display: table;     
+    width: 100%;
+    position: relative;
+}
+
+.stepwizard-step button[disabled] {
+    opacity: 1 !important;
+    filter: alpha(opacity=100) !important;
+}
+
+.stepwizard-row:before {
+    top: 14px;
+    bottom: 0;
+    position: absolute;
+    content: " ";
+    width: 100%;
+    height: 1px;
+    background-color: #ccc;
+    z-order: 0;
+    
+}
+
+.stepwizard-step {    
+    display: table-cell;
+    text-align: center;
+    position: relative;
+}
+
+.btn-circle {
+  width: 30px;
+  height: 30px;
+  text-align: center;
+  padding: 6px 0;
+  font-size: 12px;
+  line-height: 1.428571429;
+  border-radius: 15px;
+}</style>
   </head>
 
   <body class="nav-md">
@@ -214,6 +261,7 @@
         <!-- /top navigation -->
 
         <!-- page content -->
+
         <div class="right_col" role="main">
           <div class="">
             <div class="page-title">
@@ -302,9 +350,38 @@
                                                     <h4 class='panel-title'>".$cmplnt->complaint_subject."</h4> &nbsp; ".$resolv_mssg."</h2>
                                                   </a>
                                                   <div id='cmpnt_tab_collapse_".$counter."' class='panel-collapse collapse' role='tabpanel' aria-labelledby='headingOne'>
-                                                    <div class='panel-body'>
+                                                    <div class='panel-body form_wizard wizard_horizontal'>
                                                       
                                                       <hr>
+                                                      <div class='stepwizard'>
+    <div class='stepwizard-row'>
+        <div class='stepwizard-step'>";
+        	if($cmplnt->status == 'initiated' || $cmplnt->status == 'viewed' || $cmplnt->status == 'in_progress' || $cmplnt->status == 'resolved') echo "<button type='button' class='btn btn-primary btn-circle'>1</button>";
+        	else echo "<button type='button' class='btn btn-default btn-circle'>1</button>";
+        	echo "
+            <p>Initiated</p>
+        </div>
+        <div class='stepwizard-step'>";
+        	if($cmplnt->status == 'viewed' || $cmplnt->status == 'in_progress' || $cmplnt->status == 'resolved') echo "<button type='button' class='btn btn-primary btn-circle'>2</button>";
+        	else echo "<button type='button' class='btn btn-default btn-circle'>2</button>";
+        	echo "
+            <p>Viewed</p>
+        </div>
+        <div class='stepwizard-step'>";
+        	if($cmplnt->status == 'in_progress' || $cmplnt->status == 'resolved') echo "<button type='button' class='btn btn-primary btn-circle'>3</button>";
+        	else echo "<button type='button' class='btn btn-default btn-circle'>3</button>";
+        	echo "
+            <p>In Progress</p>
+        </div>
+        <div class='stepwizard-step'>";
+        	if($cmplnt->status == 'resolved') echo "<button type='button' class='btn btn-primary btn-circle'>4</button>";
+        	else echo "<button type='button' class='btn btn-default btn-circle'>4</button>";
+        	echo "
+            <p>Resolved</p>
+        </div>
+    </div>
+</div>
+
 
                                                       <p><strong>SUBJECT</strong>
                                                       </p>
@@ -330,18 +407,37 @@
 
                                                       <hr>
 
+                                                      <p><strong>Worker Assigned</strong>
+                                                      </p>
+                                                      ";
+                                                      if($cmplnt->worker != NULL) {
+                                                      	$worker = fetchWorker($cmplnt->worker);
+                                                      	echo "".$worker->worker_name."";
+                                                      }
+                                                      else echo "No Worker Assigned";
+                                                      echo "
+
+                                                      <hr>
+
+                                                      <p><strong>Date Alloted:</strong>
+                                                      </p>
+                                                      ".$cmplnt->date."
+
+                                                      <hr>
+
+                                                      <p><strong>Time Alloted:</strong>
+                                                      </p>
+                                                      ".$cmplnt->time."
+
+                                                      
+                                                      <hr>
+
 
                                                             <div class='x_content' style='text-align: center;'>
 
-                                                                  <button type='button' onclick=\"ajax_reg_request_approve('".$memb->house_id."', 'false')\" class='btn btn-round btn-success'> Thanks Admin ! You resolved my issue. </button>
+                                                                  <button type='button' onclick='ajaxIssueResolved(".$cmplnt->complaint_id.")' class='btn btn-round btn-success'> Thanks Admin ! You resolved my issue. </button>
 
-                                                                  <button type='button' onclick=\"ajax_reg_request_sndmssg('".$memb->house_id."', 'Plz meet Mr. Shishir Tamotia personally for approval of your Talpuri RWA registration request.')\" class='btn btn-round btn-primary'>Request Admin to Call me</button>
-
-                                                                  <button type='button' onclick=\"ajax_reg_request_approve('".$memb->house_id."', 'true')\" class='btn btn-round btn-info'> ITS URGENT. I need HELP </button>
-
-                                                                  <button type='button' onclick=\"ajax_reg_request_reject('".$memb->house_id."', 'Plz resubmit your Talpuri RWA registration request with complete & correct details. Contact Mr. Shishir Tamotia for details.')\"  class='btn btn-round btn-warning'> I resolved this issue on my own</button>
-
-                                                                  <button type='button' onclick=\"ajax_reg_request_reject('".$memb->house_id."', '')\" class='btn btn-round btn-danger'> Delete This Complaint</button>
+                                                                  <button type='button' onclick='ajaxDeleteComplaint(".$cmplnt->complaint_id.")' class='btn btn-round btn-danger'> Delete This Complaint</button>
                                                                 </div>
 
 
@@ -381,6 +477,78 @@
 
         </div>
         <!-- /page content -->
+
+        <script type="text/javascript">
+
+                      var ajaxDeleteComplaint = function(input_comp_id)
+                      {
+                                                  
+                              $.ajaxSetup({
+                            headers: {
+                              'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                            }
+                          });
+
+                        slash_last_indx = window.location.href.lastIndexOf('/')
+
+                        //window.alert(window.location.href.substring(0,slash_last_indx) + '/VR_scripts/helper_modules.php');
+
+                         $.ajax({
+                                   type: "POST",
+                                   //CSRF: getCSRFTokenValue(),
+                                   //url:  'VR_scripts/helper_modules.php',
+                                   url : window.location.href.substring(0,slash_last_indx) + '/../VR_scripts/helper_modules.php',
+                                   data: {action:'delete_complaint', comp_id : input_comp_id},
+                                   success:function(return_data) {
+                                    new PNotify({
+                                      text: 'Success !',
+                                      text: 'Successfully deleted!',
+                                      type: 'success',
+                                      styling: 'bootstrap3'
+                                    });
+                                    window.setTimeout(function(){location.reload()},5000);
+                                   }
+
+                              });
+
+
+                      }
+
+                      var ajaxIssueResolved = function(input_comp_id)
+                      {
+                                                  
+                              $.ajaxSetup({
+                            headers: {
+                              'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                            }
+                          });
+
+                        slash_last_indx = window.location.href.lastIndexOf('/')
+
+                        //window.alert(window.location.href.substring(0,slash_last_indx) + '/VR_scripts/helper_modules.php');
+
+                         $.ajax({
+                                   type: "POST",
+                                   //CSRF: getCSRFTokenValue(),
+                                   //url:  'VR_scripts/helper_modules.php',
+                                   url : window.location.href.substring(0,slash_last_indx) + '/../VR_scripts/helper_modules.php',
+                                   data: {action:'issue_resolved', comp_id : input_comp_id},
+                                   success:function(return_data) {
+                                    new PNotify({
+                                      text: 'Success !',
+                                      text: 'Successfully Updated resolved flag!',
+                                      type: 'success',
+                                      styling: 'bootstrap3'
+                                    });
+                                    window.setTimeout(function(){location.reload()},5000);
+                                   }
+
+                              });
+
+
+                      }
+
+                  </script>
 
         <!-- footer content -->
         <footer>
@@ -639,6 +807,8 @@
     <script src="../../vendors/fastclick/lib/fastclick.js"></script>
     <!-- NProgress -->
     <script src="../../vendors/nprogress/nprogress.js"></script>
+    <!-- jQuery Smart Wizard -->
+    <script src="../../vendors/jQuery-Smart-Wizard/js/jquery.smartWizard.js"></script>
     <!-- bootstrap-progressbar -->
     <script src="../../vendors/bootstrap-progressbar/bootstrap-progressbar.min.js"></script>
     <!-- iCheck -->

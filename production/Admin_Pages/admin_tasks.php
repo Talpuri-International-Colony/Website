@@ -465,84 +465,84 @@
 
 
                                                     <div class="col-md-12 col-sm-6 col-xs-12">
+                                                    	<div class="x_panel">
+                  <div class="x_title">
+                    <h2>All Unresolved Complaints</h2>
+                    <div class="clearfix"></div>
+                  </div>
+                  <div class="x_content">
 
-                                                        <div class="x_panel">
-                                                          <div class="x_title">
-                                                            <h2> Here is a list of all Unresolved Complaints <small> Respond to them by taking action </small></h2>
-                                                            <ul class="nav navbar-right panel_toolbox">
-                                                              <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
-                                                              </li>
-                                                              <li class="dropdown">
-                                                                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
-                                                                <ul class="dropdown-menu" role="menu">
-                                                                  <li><a href="#">Settings 1</a>
-                                                                  </li>
-                                                                  <li><a href="#">Settings 2</a>
-                                                                  </li>
-                                                                </ul>
-                                                              </li>
-                                                              <li><a class="close-link"><i class="fa fa-close"></i></a>
-                                                              </li>
-                                                            </ul>
-                                                            <div class="clearfix"></div>
-                                                          </div>
-                                                          <div class="x_content">
-                                                            <ul class="list-unstyled timeline">
+                    <div class="table-responsive">
+                      <table class="table table-striped jambo_table bulk_action">
+                        <thead>
+                          <tr class="headings">
+                            <!--
+                            <th>
+                              <input type="checkbox" id="check-all" class="flat">
+                            </th>
+                            -->
+                            <th class="column-title">Id </th>
+                            <th class="column-title">Subject </th>
+                            <th class="column-title">Date </th>
+                            <th class="column-title">Complaintant </th>
+                            <th class="column-title">Status </th>
+                            <th class="column-title no-link last"><span class="nobr">Action</span>
+                            </th>
+                            <th class="bulk-actions" colspan="7">
+                              <a class="antoo" style="color:#fff; font-weight:500;">Bulk Actions ( <span class="action-cnt"> </span> ) <i class="fa fa-chevron-down"></i></a>
+                            </th>
+                          </tr>
+                        </thead>
 
+                        <tbody>
+                          <?php
+                            $all_unres_complaints = fetchAllUnresolvedComplaints();
 
+                            $count = 0;
 
-                                                            <?php 
+                            foreach ($all_unres_complaints as $cmplnt) {
+                              $count = $count + 1;
 
+                              if($count%2) echo "<tr class='odd pointer'>";
+                              else echo "<tr class='even pointer'>";
 
-                                                            $all_unres_complaints = fetchAllUnresolvedComplaints();
+                              echo "
+                                <td class=''>".$cmplnt->complaint_id."</td>
+                                <td class=''>".$cmplnt->complaint_subject."</td>
+                                <td class=''>".$cmplnt->time_stamp."</td>
+                                <td class=''>".$cmplnt->complainant."</td>
+                                <td class=''>".$cmplnt->status."</td>
+                                <td class='' hidden>".$cmplnt->complaint_body."</td>
+                                <td class='' hidden>".$cmplnt->worker."</td>
+                                <td class=' last'>";
+                                if($cmplnt->status=='initiated' || $cmplnt->status=='viewed') {
+                                	echo "
+                                	<a href='#' id='btn_view_notice' class='btn btn-info view_buttons'><i class='fa fa-eye'></i></a>
+                                	";
+                              	}
+                              	else {
+                              		echo "
+                                	<span class='btn btn-default'><i class='fa fa-eye'></i></span>
+                                	";
+                              	}
+                              	echo "
+                                <a href='#' class='btn btn-danger' onclick='delete_complaint(".$cmplnt->complaint_id.")'><i class='fa fa-remove'></i></a>
+                                </td>
+                              ";
+                              echo "</tr>";
+                            }
+                            
+                          ?>
 
+                          
+                        </tbody>
+                      </table>
+                    </div>
 
-                                                              $counter = 0;
-                                                              foreach ($all_unres_complaints as $cmplnt) {
-
-                                                                $counter = $counter + 1;
-
-
-                                                            echo"
-                                                              <li>
-                                                                <div class='block'>
-                                                                  <div class='tags'>
-
-                                                                    <a data-toggle='modal' data-target='.bs-example-modal-lg' class='tag'>
-                                                                      <span>Resolve</span>
-                                                                    </a>
-
-                                                                    <hr>
-                                                                    <form>
-                                                                    <input type='text' id='comp_id' value='".$cmplnt->complaint_id."' hidden>
-                                                                     <a class='btn btn-danger' onclick='delete_complaint(".$cmplnt->complaint_id.")''> Delete </a>
-                                                                    </form>
-                                                                  </div>
-                                                                  <div class='block_content'>
-                                                                    <h2 class='title'>
-                                                                                    <a>".$cmplnt->complaint_subject."</a>
-                                                                                </h2>
-                                                                    <div class='byline'>
-                                                                      <span>".$cmplnt->time_stamp."</span> by <a>".$cmplnt->complainant."</a>
-                                                                    </div>
-                                                                    <p class='excerpt'>
-                                                                      ".$cmplnt->complaint_body."
-                                                                    </p>
-                                                                    <strong> STATUS : </strong> <h5> ".$cmplnt->status." </h5>
-                                                                  </div>
-                                                                </div>
-                                                              </li>";
-
-                                                            }
-
-                                                              ?>
-
-
-
-                                                            </ul>
-
-                                                          </div>
-                                                        </div>
+                  </div>
+                </div>
+                <!--unresolved complains end-->
+                                                        
                                                       </div>
 
 
@@ -752,6 +752,18 @@
                         $("#ncontent").val($(this).closest('tr').children()[3].textContent);
                       });
 
+                      $('.view_buttons').on('click',function(){
+                        $("#view_complaint").modal("show");
+                        $("#cid_modal").val($(this).closest('tr').children()[0].textContent);
+                        $("#cbadge").text("CID:" + $(this).closest('tr').children()[0].textContent);
+                        $("#csubject").text($(this).closest('tr').children()[1].textContent);
+                        $("#cdate").text($(this).closest('tr').children()[2].textContent);
+                        $("#cuser").text($(this).closest('tr').children()[3].textContent);
+                        $("#cstatus").text($(this).closest('tr').children()[4].textContent);
+                        $("#cbody").text($(this).closest('tr').children()[5].textContent);
+                        $("#cworker").val($(this).closest('tr').children()[6].textContent);
+                      });
+
                       var delete_notice = function(n_id)
                       {                                      
                             $.ajaxSetup({
@@ -778,6 +790,76 @@
                                       styling: 'bootstrap3'
                                     });
                                     window.setTimeout(function(){location.reload()},5000);
+                                   }
+
+                              });
+
+
+                      }
+
+                      var ajaxResolveComplaint = function()
+                      {     
+                      		var cid = $('#cid_modal').val();
+                        	var wid = $('#wid_modal').val();
+                        	var date = $('#resolve_date').val();
+                        	var time = $('#resolve_time').val();
+                            $.ajaxSetup({
+                            headers: {
+                              'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                            }
+                          });
+
+                        slash_last_indx = window.location.href.lastIndexOf('/')
+
+                        //window.alert(window.location.href.substring(0,slash_last_indx) + '/VR_scripts/helper_modules.php');
+
+                         $.ajax({
+                                   type: "POST",
+                                   //CSRF: getCSRFTokenValue(),
+                                   //url:  'VR_scripts/helper_modules.php',
+                                   url : window.location.href.substring(0,slash_last_indx) + '/../VR_scripts/helper_modules.php',
+                                   data: {action:'resolve_complaint', comp_id: cid, worker_id : wid, comp_date: date, comp_time : time},
+                                   success:function(return_data) {
+                                    new PNotify({
+                                      title: 'Success !',
+                                      text: 'Successfully alloted a worker!',
+                                      type: 'success',
+                                      styling: 'bootstrap3'
+                                    });
+                                    window.setTimeout(function(){location.reload()},5000);
+                                   }
+
+                              });
+
+
+                      }
+
+                      var ajaxComplaintViewed = function()
+                      {     
+                      		var cid = $('#cid_modal').val();
+                            $.ajaxSetup({
+                            headers: {
+                              'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                            }
+                          });
+
+                        slash_last_indx = window.location.href.lastIndexOf('/')
+
+                        //window.alert(window.location.href.substring(0,slash_last_indx) + '/VR_scripts/helper_modules.php');
+
+                         $.ajax({
+                                   type: "POST",
+                                   //CSRF: getCSRFTokenValue(),
+                                   //url:  'VR_scripts/helper_modules.php',
+                                   url : window.location.href.substring(0,slash_last_indx) + '/../VR_scripts/helper_modules.php',
+                                   data: {action:'view_complaint', comp_id: cid},
+                                   success:function(return_data) {
+                                    new PNotify({
+                                      title: 'Success !',
+                                      text: 'Complaint viewed!',
+                                      type: 'success',
+                                      styling: 'bootstrap3'
+                                    });
                                    }
 
                               });
@@ -877,9 +959,70 @@
                   </div>
 
 
+                  <!-- Modal for complaints -->
+                  <div class="modal fade bs-example-modal-lg" id="view_complaint" tabindex="-1" role="dialog" aria-hidden="true">
+                    <div class="modal-dialog modal-lg">
+                      <div class="modal-content">
+
+                        <div class="modal-header">
+                          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span>
+                          </button>
+                          <h4 class="modal-title" id="myModalLabel2">View Complaint</h4>
+                        </div>
+                        <div class="modal-body">
+                          <p>You can now decide how to resolve this problem.</p>
+                            <form id="resolve_complaint" class="form-group">
+                              <input type="text" id="cid_modal" name="cid" size="1" readonly hidden/>
+                              <span id="cbadge" class="badge bg-green"></span>
+                              <strong><span id="csubject"></span></strong> on 
+                              <i><span id="cdate"></span></i> by
+                              <u><span id="cuser"></span></u>
+                              <span class="label label-info" id="cstatus"></span>
+                              <br/>
+                              <label for="cbody">Complaint:</label>
+                              <blockquotes><p id="cbody"></p></blockquote>
+                              <hr>
+                              <label for="wid_modal">Select Worker:</label>
+                              <select id="wid_modal" class="select2_group form-control">
+                                          	<?php
+                            					$workerlist = fetchAllWorkers();
+
+                            					$count = 0;
+
+                            					foreach ($workerlist as $worker) {
+                              						$count = $count + 1;
+
+                              						echo "
+                                					<option value=".$worker->worker_id.">".$worker->worker_name." -- ".$worker->worker_job."</option>";
+                            					}		
+                            
+                          					?>
+
+                                          </select>
+                              <label for="resolve_date">Select Date:</label>
+                              <input type="date" id="resolve_date" class="form-control"/>
+                              <label for="resolve_time">Select Time:</label>
+                              <input type="time" id="resolve_time" class="form-control"/>
+                              
+                          <br/>
+                          <!-- <span class="btn btn-primary" onclick="add_notice()">Add Notice</span> -->
+
+                    </form>
+                    <!-- end form for validations -->
+                        </div>
+                        <div class="modal-footer">
+                          <button type="button" class="btn btn-default" id="view_close"  onclick='ajaxComplaintViewed()' data-dismiss="modal">Close</button>
+                          <button type="button" class="btn btn-primary" onclick="ajaxResolveComplaint()">Resolve Complaint</button>
+                        </div>
+
+                      </div>
+                    </div>
+                  </div>
+
+
                           <!-- Large modal -->
 
-                          <div class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-hidden="true">
+                          <div id="resolve_modal" class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-hidden="true">
                             <div class="modal-dialog modal-lg">
                               <div class="modal-content">
 
@@ -894,54 +1037,22 @@
 
                                      <div class="form-group">
                                       <div class="col-md-9 col-sm-9 col-xs-12">
+                                      		<input type="text" id="cid_hidden" required>
+                                          <select id="wid_select" class="select2_group form-control">
+                                          	<?php
+                            					$workerlist = fetchAllWorkers();
 
-                                          <select class="select2_group form-control">
+                            					$count = 0;
 
-                                               <optgroup label="House Generic Support">
-                                                 <option value="something here"><a href='general_elements.html'> Plumbers </a></option>
-                                                  <option value="something here"><a href='media_gallery.html'> Electrician </a></option>
-                                                  <option value="something here"><a href='typography.html'> Mason / Handyman </a></option>
-                                                  <option value="something here"><a href='icons.html'>Painters</a></option>
-                                                  <option value="something here"><a href='widgets.html'>Carpenter</a></option>
-                                              </optgroup>
+                            					foreach ($workerlist as $worker) {
+                              						$count = $count + 1;
 
-                                              <optgroup label="Electronic Appliances Support">
-                                                  <option value="something here"><a href='glyphicons.html'>Air-Conditioning</a></option>
-                                                  <option value="something here"><a href='invoice.html'>Kitchen Appliances Repair</a></option>
-                                              </optgroup>
+                              						echo "
+                                					<option value=".$worker->worker_id.">".$worker->worker_name."</option>";
+                            					}		
+                            
+                          					?>
 
-
-                                               <optgroup label="Water Related Support">
-                                                  <option value="something here"><a href='calendar.html'>House Water Supply</a></option>
-                                                  <option value="something here"><a href='calendar.html'>Water Drainage</a></option>
-                                                  <option value="something here"><a href='calendar.html'>Sewage Treatment & Disposal </a></option>
-                                              </optgroup>
-
-
-
-                                              <optgroup label="Other General Support">
-                                                
-                                                <option value="something here"><a href='inbox.html'>House Maids</a></option>
-                                                <option value="something here"><a href='calendar.html'>Security</a></option>
-                                                
-                                                <option value="something here"><a href='calendar.html'>Electricity Failure</a></option>
-                                                <option value="something here"><a href='calendar.html'>Landoptionne issues</a></option>
-                                                <option value="something here"><a href='calendar.html'>Catering needs</a></option>
-                                                <option value="something here"><a href='calendar.html'>Theft</a></option>
-                                                <option value="something here"><a href='calendar.html'>Snakes / Dog nuisance</a></option>
-                                                <option value="something here"><a href='calendar.html'>Medical Needs</a></option>
-                                                <option value="something here"><a href='calendar.html'>Road Accidents</a></option>
-                                                <option value="something here"><a href='calendar.html'>Fire Brigade</a></option>
-                                                <option value="something here"><a href='calendar.html'>Street optionght</a></option>
-                                                <option value="something here"><a href='calendar.html'>optionfts</a></option>
-                                                
-                                                
-                                                <option value="something here"><a href='calendar.html'>Open Space / Garden Management</a></option>
-                                                <option value="something here"><a href='calendar.html'>Road/Drain Cleaning</a></option>
-                                                <option value="something here"><a href='calendar.html'>Garbage Collection</a></option>
-                                                <option value="something here"><a href='calendar.html'>General Support</a> </option>
-
-                                              </optgroup>
                                           </select>
 
                                       </div>
@@ -954,7 +1065,8 @@
                                 </div>
 
                                 <div class="modal-footer">
-                                  <button type="button" class="btn btn-success" onclick="ajaxResolveComplaint()"> Set this complaint to RESOLVING stage </button>
+                                  <button type="button" class="btn btn-success" onclick="ajaxResolveComplaint(
+                                  )"> Set this complaint to RESOLVING stage </button>
                                   
                                   <button id='btn_close_cmpnt_title_modal' type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                                 </div>

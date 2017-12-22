@@ -505,7 +505,9 @@ Indians living abroad such as US, Canada and Australia.
 <script src="assets/js/jquery.magnific-popup.min.js"></script>
 
 <!-- Google Maps Script -->
-<script src="http://maps.google.com/maps/api/js?sensor=true"></script>
+<!--<script src="http://maps.google.com/maps/api/js?sensor=true"></script>-->
+<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCOeUyYIPHuceKr2orIv_zlfg07xuXe8Pg&callback=initMap"
+  type="text/javascript"></script>
 
 <!-- Gmap3.js For Static Maps -->
 <script src="assets/js/gmap3.js"></script>
