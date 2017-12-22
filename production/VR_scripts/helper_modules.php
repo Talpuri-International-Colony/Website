@@ -199,7 +199,7 @@ echo
                   <li><a><i class='fa fa-edit'></i> My Tasks <span class='fa fa-chevron-down'></span></a>
                     <ul class='nav child_menu'>
                       <li><a href='member_complaints.php'>  My Complaints </a></li>
-                      <li><a href=''> Notice Board </a></li>
+                      <li><a href='member_notice.php'> Notice Board </a></li>
                     </ul>
                   </li>
                   <li><a><i class='fa fa-users'></i> Support Contacts <span class='fa fa-chevron-down'></span></a>
