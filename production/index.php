@@ -258,7 +258,7 @@ Indians living abroad such as US, Canada and Australia.
   <div class="portfolio-area">
     <div class="portfolio-top">
       <h2 class="portfolio-title">Gallery At Glance</h2>
-      <p class="title-description">Have a look at some of the beautiful architecture of Talpuri.</p>
+     <h2><a href="gallery.php">Click here to view all images</a></h2>
       <div class="slide-nav-container">
         <a class="slide-nav left slide-left post-prev" data-slide="post-prev"><i class="fa fa-angle-left"></i></a>
         <a class="slide-nav right slide-right post-next" data-slide="post-next"><i class="fa fa-angle-right"></i></a>
@@ -296,30 +296,7 @@ Indians living abroad such as US, Canada and Australia.
         </div>  
 		<span class="item-title">GULMOHAR</span>
       </div>
-      <div class="item">
-        <div class="item-image">
-          <img src="images/portfolio/6.jpg" alt="Portfolio Image" style="width: 200px ; height: 100px">
-        </div>
-        <span class="item-title">DAHLIA</span>
-      </div>
-      <div class="item">
-        <div class="item-image">
-          <img src="images/portfolio/7.jpg" alt="Portfolio Image" style="width: 200px ; height: 100px">
-        </div>
-        <span class="item-title">DAISY</span>
-      </div>
-      <div class="item">
-        <div class="item-image">
-          <img src="images/portfolio/8.jpg" alt="Portfolio Image" style="width: 200px ; height: 100px">
-        </div>
-        <span class="item-title">MOGRA</span>
-      </div>
-      <div class="item">
-        <div class="item-image">
-          <img src="images/portfolio/9.jpg" alt="Portfolio Image" style="width: 200px ; height: 100px">
-        </div>
-        <span class="item-title">JUHI</span>
-      </div>
+      
     </div>
   </div><!-- /.portfolio-area -->
 </div><!-- /.container -->
@@ -443,38 +420,7 @@ Indians living abroad such as US, Canada and Australia.
 
 
 <footer>
-  <div id="footer-top" class="footer-top">
-    <div class="container">
-      <div class="row">
-        <div id="tweet" class="tweet text-left">
-          <div class="col-xs-4 about-tweet">
-            <span class="tweet-icon"><i class="fa fa-twitter"></i></span>
-            <span class="tweet-author">John Doe</span>
-            <p class="tweet-details">
-              Sed semper lorem at felis. Vestibulum volutpat, lacus a ultrices sagittis eupulvinar nuncint
-            </p><!-- /.tweet-details -->
-            <time datetime="PT2H">2 Hours Ago</time>
-          </div>
-          <div class="col-xs-4 about-tweet">
-            <span class="tweet-icon"><i class="fa fa-twitter"></i></span>
-            <span class="tweet-author">John Doe</span>
-            <p class="tweet-details">
-              Sed semper lorem at felis. Vestibulum volutpat, lacus a ultrices sagittis eupulvinar nuncint
-            </p><!-- /.tweet-details -->
-            <time datetime="PT2H">2 Hours Ago</time>
-          </div>
-          <div class="col-xs-4 about-tweet">
-            <span class="tweet-icon"><i class="fa fa-twitter"></i></span>
-            <span class="tweet-author">John Doe</span>
-            <p class="tweet-details">
-              Sed semper lorem at felis. Vestibulum volutpat, lacus a ultrices sagittis eupulvinar nuncint
-            </p><!-- /.tweet-details -->
-            <time datetime="PT2H">2 Hours Ago</time>
-          </div>
-        </div><!-- /#tweet -->
-      </div><!-- /.row -->
-    </div><!-- /.container -->
-  </div><!-- /#footer-top -->
+ 
 
   <div id="footer-bottom" class="footer-bottom text-center">
     <div class="container">
